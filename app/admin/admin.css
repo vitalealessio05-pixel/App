@@ -1,0 +1,295 @@
+/* ============================================================
+   MAISOLA ADMIN — identità visiva separata dall'app studenti.
+   Palette neutra, tipografia da strumento di lavoro, zero
+   animazioni decorative. Questo file si applica SOLO sotto /admin.
+   ============================================================ */
+
+.adm {
+  --a-bg: #F5F6F8;
+  --a-surface: #FFFFFF;
+  --a-border: #E2E4E9;
+  --a-ink: #14171F;
+  --a-muted: #6B7280;
+  --a-accent: #3452E1;
+  --a-accent-soft: #EAEDFC;
+  --a-ok: #0F9D68;
+  --a-ok-soft: #E4F7EE;
+  --a-warn: #C2410C;
+  --a-warn-soft: #FDECE3;
+  --a-radius: 10px;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--a-bg);
+  color: var(--a-ink);
+  min-height: 100vh;
+}
+
+/* il layout globale studente stringe tutto a 480px: l'admin esce da quel vincolo */
+.wrap:has(.adm) {
+  max-width: none;
+  padding: 0;
+}
+
+.adm-topbar {
+  background: var(--a-surface);
+  border-bottom: 1px solid var(--a-border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.adm-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.adm-brand-mark {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--a-ink);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+.adm-brand-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--a-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--a-bg);
+  border: 1px solid var(--a-border);
+  padding: 2px 8px;
+  border-radius: 5px;
+  margin-left: 6px;
+}
+
+.adm-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--a-muted);
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  transition: background .12s ease, color .12s ease;
+}
+.adm-link:hover { background: var(--a-bg); color: var(--a-ink); }
+
+.adm-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 28px 80px;
+}
+
+.adm-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0 0 4px;
+}
+.adm-subtitle {
+  font-size: 13.5px;
+  color: var(--a-muted);
+  margin: 0 0 24px;
+}
+
+.adm-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 980px) {
+  .adm-grid { grid-template-columns: 1fr; }
+  .adm-body { padding: 20px 16px 60px; }
+}
+
+.adm-sticky { position: sticky; top: 78px; }
+
+.adm-card {
+  background: var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.adm-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.adm-card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin: 0;
+}
+.adm-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--a-bg);
+  color: var(--a-muted);
+  border: 1px solid var(--a-border);
+}
+.adm-card-sub {
+  font-size: 12.5px;
+  color: var(--a-muted);
+  margin: 4px 0 14px;
+}
+
+.adm-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+  margin: 16px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--a-border);
+}
+.adm-section-label:first-child { margin-top: 0; }
+
+.adm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 9px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: background .1s ease;
+}
+.adm-row:hover { background: var(--a-bg); }
+.adm-row.sel { background: var(--a-accent-soft); }
+.adm-row input[type=checkbox] {
+  width: 16px; height: 16px; accent-color: var(--a-accent); flex: none;
+}
+.adm-row-meta { color: var(--a-muted); font-size: 12.5px; }
+.adm-flag {
+  color: var(--a-warn);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+
+.adm-divider {
+  border: none;
+  border-top: 1px solid var(--a-border);
+  margin: 14px 0;
+}
+
+.adm-btn {
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 15px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, opacity .12s ease;
+}
+.adm-btn-primary {
+  background: var(--a-ink);
+  color: #fff;
+}
+.adm-btn-primary:hover { opacity: 0.88; }
+.adm-btn-accent {
+  background: var(--a-accent);
+  color: #fff;
+}
+.adm-btn-accent:hover { opacity: 0.9; }
+.adm-btn-ghost {
+  background: var(--a-surface);
+  color: var(--a-ink);
+  border-color: var(--a-border);
+}
+.adm-btn-ghost:hover { background: var(--a-bg); }
+.adm-btn-danger-ghost {
+  background: var(--a-surface);
+  color: var(--a-warn);
+  border-color: var(--a-border);
+}
+.adm-btn-danger-ghost:hover { background: var(--a-warn-soft); }
+.adm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.adm-bar {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, var(--a-bg) 60%, transparent);
+  padding: 16px 0 4px;
+  margin-top: 8px;
+}
+
+.adm-msg {
+  background: var(--a-ok-soft);
+  color: #0B6B47;
+  border: 1px solid #C7ECDA;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.adm-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--a-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 6px;
+}
+.adm-input, .adm-select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  padding: 8px 10px;
+  border: 1px solid var(--a-border);
+  border-radius: 7px;
+  background: var(--a-surface);
+  color: var(--a-ink);
+}
+.adm-input:focus, .adm-select:focus {
+  outline: none;
+  border-color: var(--a-accent);
+}
+
+.adm-empty {
+  font-size: 13px;
+  color: var(--a-muted);
+  padding: 8px 0;
+}
+
+.adm-item {
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid var(--a-border);
+}
+.adm-item:first-child { padding-top: 0; margin-top: 0; border-top: none; }
+.adm-item-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 0;
+}
+.adm-item-meta {
+  font-size: 12px;
+  color: var(--a-muted);
+  margin: 3px 0 10px;
+}
+
+.adm-guard {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  color: var(--a-muted);
+}

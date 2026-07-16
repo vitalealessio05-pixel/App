@@ -22,6 +22,7 @@ export default function Home() {
 
       const { data: p } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
       if (!p) { router.replace('/onboarding'); return; }
+      if (p.is_admin) { router.replace('/admin'); return; }
       setProfilo(p);
 
       const { data: membri } = await sb
@@ -74,12 +75,6 @@ export default function Home() {
       </div>
 
       <Notifiche />
-
-      {profilo?.is_admin && (
-        <button className="btn-ghost" onClick={() => router.push('/admin')}>
-          Pannello admin
-        </button>
-      )}
     </div>
   );
 }
