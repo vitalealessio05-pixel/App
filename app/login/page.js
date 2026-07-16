@@ -67,23 +67,42 @@ export default function Onboarding() {
     setErr('');
     setSalvo(true);
 
-    const sb = supabase();
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) { router.replace('/login'); return; }
+    try {
+      const sb = supabase();
 
-    const { error } = await sb.from('profiles').insert({
-      id: session.user.id,
-      nome: pulisci(nome),
-      ateneo: vAteneo,
-      campus: vCampus,
-      corso: vCorso,
-      anno: Number(anno),
-      disponibilita: dispo,
-      conosce_nome: pulisci(conosce) || null,
-    });
+      const { data: sessionData, error: sessErr } = await sb.auth.getSession();
+      if (sessErr) throw sessErr;
 
-    if (error) { setErr(error.message); setSalvo(false); return; }
-    router.replace('/home');
+      const session = sessionData?.session;
+      if (!session) {
+        setErr('Sessione scaduta. Rifai il login.');
+        setSalvo(false);
+        setTimeout(() => router.replace('/login'), 1200);
+        return;
+      }
+
+      const { error } = await sb.from('profiles').upsert(
+        {
+          id: session.user.id,
+          nome: pulisci(nome),
+          ateneo: vAteneo,
+          campus: vCampus,
+          corso: vCorso,
+          anno: Number(anno),
+          disponibilita: dispo,
+          conosce_nome: pulisci(conosce) || null,
+        },
+        { onConflict: 'id' }
+      );
+
+      if (error) throw error;
+
+      router.replace('/home');
+    } catch (e) {
+      console.error('Errore salvataggio profilo:', e);
+      setErr(e?.message || 'Qualcosa non ha funzionato. Riprova.');
+      setSalvo(false);
+    }
   }
 
   return (
