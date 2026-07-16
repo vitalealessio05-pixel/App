@@ -41,7 +41,7 @@ export default function NuovaPassword() {
       router.replace('/home');
     } catch (e) {
       console.error(e);
-      setErr(e?.message || 'Non è riuscito. Riprova.');
+      setErr('Non è riuscito. Riprova.');
       setSalvo(false);
     }
   }

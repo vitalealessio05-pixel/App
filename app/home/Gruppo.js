@@ -168,7 +168,7 @@ function Missione({ gm, membri, profilo, onDone }) {
       onDone();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || 'Il caricamento non è riuscito.');
+      setErr('Il caricamento non è riuscito. Riprova.');
       setInvio(false);
     }
   }

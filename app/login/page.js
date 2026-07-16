@@ -31,7 +31,8 @@ export default function Login() {
         } else if (m.includes('email not confirmed')) {
           setErr('Devi ancora confermare la mail. Apri il link che ti abbiamo mandato.');
         } else {
-          setErr(error.message);
+          console.error('signIn:', error);
+          setErr('Accesso non riuscito. Riprova.');
         }
         setStato('idle');
         return;
@@ -46,7 +47,7 @@ export default function Login() {
       router.replace(p ? '/home' : '/onboarding');
     } catch (e) {
       console.error(e);
-      setErr(e?.message || 'Qualcosa non ha funzionato.');
+      setErr('Qualcosa non ha funzionato. Riprova.');
       setStato('idle');
     }
   }

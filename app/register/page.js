@@ -38,11 +38,12 @@ export default function Register() {
         if (m.includes('already registered') || m.includes('already been registered')) {
           setErr('Questa mail è già registrata. Vai su Accedi.');
         } else if (m.includes('rate limit') || error.status === 429) {
-          setErr('Troppe mail inviate da questo progetto. Riprova tra un’ora.');
+          setErr('Non riusciamo a mandare la mail in questo momento. Riprova tra un’ora.');
         } else if (m.includes('password')) {
           setErr('Password troppo debole. Prova con qualcosa di più lungo.');
         } else {
-          setErr(error.message);
+          console.error('signUp:', error);
+          setErr('Registrazione non riuscita. Riprova.');
         }
         setStato('idle');
         return;
@@ -56,7 +57,7 @@ export default function Register() {
       setStato('inviato');
     } catch (e) {
       console.error(e);
-      setErr(e?.message || 'Qualcosa non ha funzionato.');
+      setErr('Qualcosa non ha funzionato. Riprova.');
       setStato('idle');
     }
   }

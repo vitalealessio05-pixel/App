@@ -99,7 +99,7 @@ export default function Onboarding() {
       router.replace('/home');
     } catch (e) {
       console.error('Errore salvataggio profilo:', e);
-      setErr(e?.message || 'Qualcosa non ha funzionato. Riprova.');
+      setErr('Salvataggio non riuscito. Riprova.');
       setSalvo(false);
     }
   }

@@ -24,16 +24,17 @@ export default function Recupera() {
       if (error) {
         const m = (error.message || '').toLowerCase();
         if (m.includes('rate limit') || error.status === 429) {
-          setErr('Troppe mail inviate da questo progetto. Riprova tra un’ora.');
+          setErr('Non riusciamo a mandare la mail in questo momento. Riprova tra un’ora.');
         } else {
-          setErr(error.message);
+          console.error('reset:', error);
+          setErr('Non è riuscito. Riprova.');
         }
         setStato('idle');
         return;
       }
       setStato('inviato');
     } catch (e) {
-      setErr(e?.message || 'Qualcosa non ha funzionato.');
+      setErr('Qualcosa non ha funzionato. Riprova.');
       setStato('idle');
     }
   }
