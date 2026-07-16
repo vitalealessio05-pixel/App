@@ -60,17 +60,33 @@ export default function Admin() {
     if (sel.length < 2 || sel.length > 4) { setMsg('Seleziona da 2 a 4 persone.'); return; }
     const sb = supabase();
     const primo = attesa.find((p) => p.id === sel[0]);
+    if (!primo) { setMsg('Errore interno: persona non trovata, ricarica la pagina.'); return; }
 
     const { data: g, error } = await sb
       .from('groups')
       .insert({ segment_key: primo.segment_key, nome: `Gruppo ${primo.corso}` })
       .select('id')
       .single();
-    if (error) { setMsg(error.message); return; }
 
-    await sb.from('group_members').insert(sel.map((uid) => ({ group_id: g.id, user_id: uid })));
+    if (error) {
+      console.error('creazione gruppo:', error);
+      setMsg('Creazione gruppo fallita: ' + error.message);
+      return;
+    }
+
+    const { error: errMembri } = await sb
+      .from('group_members')
+      .insert(sel.map((uid) => ({ group_id: g.id, user_id: uid })));
+
+    if (errMembri) {
+      console.error('aggiunta membri:', errMembri);
+      setMsg('Gruppo creato ma senza membri (' + errMembri.message + '). Contattami con questo messaggio.');
+      carica();
+      return;
+    }
+
     setSel([]);
-    setMsg('Gruppo creato.');
+    setMsg('Gruppo creato con ' + sel.length + ' persone.');
     carica();
   }
 
