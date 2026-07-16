@@ -140,11 +140,14 @@ export default function Admin() {
             {persone[0].corso} · {persone[0].campus} — {persone.length} in attesa
           </p>
           {persone.map((p) => (
-            <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10,
-                                       textTransform: 'none', margin: '0 0 10px',
-                                       fontSize: 14, fontWeight: 400, color: 'var(--ink)' }}>
-              <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggleSel(p.id)}
-                     style={{ width: 18, height: 18, flex: 'none' }} />
+            <label key={p.id} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              textTransform: 'none', margin: '0 0 8px', padding: '8px 10px',
+              borderRadius: 10, fontSize: 14, fontWeight: 400, color: 'var(--ink)',
+              background: sel.includes(p.id) ? 'var(--iris-soft, #EEEBFF)' : 'transparent',
+              transition: 'background .15s ease',
+            }}>
+              <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggleSel(p.id)} />
               <span>
                 {p.nome} · {p.disponibilita} · {p.anno}° anno
                 {p.conosce_nome && (
