@@ -9,22 +9,31 @@ export default function Callback() {
 
   useEffect(() => {
     async function vai() {
-      const sb = supabase();
-      const { data: { session } } = await sb.auth.getSession();
+      try {
+        const sb = supabase();
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { router.replace('/login'); return; }
 
-      if (!session) { router.replace('/login'); return; }
+        const { data: profile } = await sb
+          .from('profiles')
+          .select('id')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-      const { data: profile } = await sb
-        .from('profiles')
-        .select('id')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      router.replace(profile ? '/home' : '/onboarding');
+        router.replace(profile ? '/home' : '/onboarding');
+      } catch (e) {
+        router.replace('/login');
+      }
     }
-    const t = setTimeout(vai, 400);
+    const t = setTimeout(vai, 500);
     return () => clearTimeout(t);
   }, [router]);
 
-  return <p className="muted">Ti stiamo facendo entrare…</p>;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  justifyContent: 'center', minHeight: '70vh' }}>
+      <div className="stamp" style={{ marginBottom: 20 }}>Entro</div>
+      <p className="muted">Ti stiamo facendo entrare…</p>
+    </div>
+  );
 }

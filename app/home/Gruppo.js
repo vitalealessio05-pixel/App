@@ -3,17 +3,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
+const COLORI = ['var(--iris)', 'var(--coral)', 'var(--mint)', 'var(--sun)'];
+
 function iniziali(nome) {
   return nome.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 }
 
-function giorniRimasti(scadenza) {
+function rimasto(scadenza) {
   const ms = new Date(scadenza) - new Date();
-  if (ms <= 0) return 'scaduta';
+  if (ms <= 0) return null;
   const g = Math.floor(ms / 86400000);
   const o = Math.floor((ms % 86400000) / 3600000);
-  if (g >= 1) return `${g} ${g === 1 ? 'giorno' : 'giorni'} rimasti`;
-  return `${o} ore rimaste`;
+  if (g >= 1) return `${g}g ${o}h`;
+  return `${o}h`;
 }
 
 export default function Gruppo({ gruppo, profilo, onRefresh }) {
@@ -54,56 +56,61 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
 
   useEffect(() => { carica(); }, [carica]);
 
-  if (caricando) return <p className="muted">Caricamento…</p>;
+  if (caricando) return <p className="muted">Un attimo…</p>;
 
   return (
     <div>
-      <h1>{gruppo.nome || 'Il tuo gruppo'}</h1>
-      <p className="sub">Siete in {membri.length}. Nessuno deve fare il primo passo da solo.</p>
+      <p className="eyebrow">Il tuo gruppo</p>
+      <h1 className="display" style={{ marginTop: 10 }}>{gruppo.nome || 'Siete un gruppo.'}</h1>
 
-      <div className="card">
-        <div style={{ display: 'flex', marginBottom: 14 }}>
+      <div className="card d1">
+        <div style={{ display: 'flex', marginBottom: 16 }}>
           {membri.map((m, i) => (
             <div key={m.id} style={{
-              width: 38, height: 38, borderRadius: '50%', background: 'var(--ok-soft)',
-              border: '2px solid #fff', marginLeft: i === 0 ? 0 : -8,
+              width: 46, height: 46, borderRadius: '50%', background: COLORI[i % 4],
+              border: '3px solid #fff', marginLeft: i === 0 ? 0 : -12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 12, fontWeight: 600, color: 'var(--ok)',
+              fontSize: 14, fontWeight: 800, color: '#fff',
+              animation: `rise .4s var(--spring) ${i * 0.08}s both`,
             }}>{iniziali(m.nome)}</div>
           ))}
         </div>
-        <p className="muted" style={{ margin: 0 }}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: 1.5 }}>
           {membri.map((m) => m.nome).join(' · ')}
         </p>
+
         {gruppo.chat_link && (
           <a href={gruppo.chat_link} target="_blank" rel="noreferrer"
-             style={{ display: 'block', marginTop: 14, textAlign: 'center', padding: 12,
-                      border: '1px solid var(--line)', borderRadius: 10,
-                      color: 'var(--ink)', textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>
-            Apri la chat del gruppo
+             style={{ display: 'block', marginTop: 18, textAlign: 'center', padding: 15,
+                      background: 'var(--iris-soft)', borderRadius: 'var(--r-md)',
+                      color: 'var(--iris)', textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
+            Apri la chat del gruppo →
           </a>
         )}
       </div>
 
-      <div className="card">
-        <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em',
-                    color: 'var(--ink-soft)', margin: '0 0 6px' }}>Punti del gruppo</p>
-        <div style={{ fontSize: 32, fontWeight: 600 }}>{punti}</div>
-        {storico.length > 0 && (
-          <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
-            {storico.length} {storico.length === 1 ? 'missione completata' : 'missioni completate'}
+      <div className="card card-iris d2" style={{ display: 'flex', alignItems: 'center',
+                                                   justifyContent: 'space-between' }}>
+        <div>
+          <p className="eyebrow" style={{ color: 'rgba(255,255,255,.6)' }}>Punti del gruppo</p>
+          <div className="display" style={{ fontSize: 42, marginTop: 6 }}>{punti}</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div className="display" style={{ fontSize: 26 }}>{storico.length}</div>
+          <p style={{ fontSize: 12, opacity: .7, margin: 0, fontWeight: 700 }}>
+            {storico.length === 1 ? 'missione' : 'missioni'}
           </p>
-        )}
+        </div>
       </div>
 
       {missione ? (
         <Missione gm={missione} membri={membri} profilo={profilo}
                   onDone={() => { carica(); onRefresh(); }} />
       ) : (
-        <div className="card">
-          <h2>Nessuna missione attiva</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            La prossima arriva a inizio settimana. Ti avvisiamo.
+        <div className="card d3">
+          <h2 className="display" style={{ fontSize: 20 }}>Niente da fare. Per ora.</h2>
+          <p className="muted" style={{ margin: '10px 0 0', lineHeight: 1.5 }}>
+            La prossima missione arriva a inizio settimana. Ti avvisiamo.
           </p>
         </div>
       )}
@@ -113,9 +120,17 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
 
 function Missione({ gm, membri, profilo, onDone }) {
   const [file, setFile] = useState(null);
+  const [anteprima, setAnteprima] = useState(null);
   const [presenti, setPresenti] = useState([profilo.id]);
   const [invio, setInvio] = useState(false);
   const [err, setErr] = useState('');
+
+  function scegli(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    setFile(f);
+    setAnteprima(URL.createObjectURL(f));
+  }
 
   function toggle(id) {
     setPresenti((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -124,92 +139,130 @@ function Missione({ gm, membri, profilo, onDone }) {
   async function invia() {
     setErr('');
     if (presenti.length < 2) {
-      setErr('Servono almeno 2 persone nella foto: è la prova che vi siete incontrati.');
+      setErr('Servono almeno 2 persone: è la prova che vi siete incontrati.');
       return;
     }
-    if (!file) { setErr('Carica la foto di gruppo.'); return; }
+    if (!file) { setErr('Manca la foto.'); return; }
 
     setInvio(true);
-    const sb = supabase();
+    try {
+      const sb = supabase();
+      const path = `${gm.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
 
-    const path = `${gm.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-    const { error: upErr } = await sb.storage.from('prove').upload(path, file);
-    if (upErr) { setErr(upErr.message); setInvio(false); return; }
+      const { error: upErr } = await sb.storage.from('prove').upload(path, file);
+      if (upErr) throw upErr;
 
-    const { data: sub, error: subErr } = await sb
-      .from('submissions')
-      .insert({ group_mission_id: gm.id, foto_path: path, caricata_da: profilo.id })
-      .select('id')
-      .single();
-    if (subErr) { setErr(subErr.message); setInvio(false); return; }
+      const { data: sub, error: subErr } = await sb
+        .from('submissions')
+        .insert({ group_mission_id: gm.id, foto_path: path, caricata_da: profilo.id })
+        .select('id')
+        .single();
+      if (subErr) throw subErr;
 
-    const { error: presErr } = await sb
-      .from('submission_presenze')
-      .insert(presenti.map((uid) => ({ submission_id: sub.id, user_id: uid })));
-    if (presErr) { setErr(presErr.message); setInvio(false); return; }
+      const { error: presErr } = await sb
+        .from('submission_presenze')
+        .insert(presenti.map((uid) => ({ submission_id: sub.id, user_id: uid })));
+      if (presErr) throw presErr;
 
-    await sb.from('group_missions').update({ stato: 'in_verifica' }).eq('id', gm.id);
-    onDone();
+      await sb.from('group_missions').update({ stato: 'in_verifica' }).eq('id', gm.id);
+      onDone();
+    } catch (e) {
+      console.error(e);
+      setErr(e?.message || 'Il caricamento non è riuscito.');
+      setInvio(false);
+    }
   }
 
   if (gm.stato === 'in_verifica') {
     return (
-      <div className="card">
-        <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em',
-                    color: 'var(--ink-soft)', margin: '0 0 8px' }}>In verifica</p>
-        <h2>{gm.missions.titolo}</h2>
-        <p className="muted" style={{ margin: 0 }}>
+      <div className="card d3" style={{ background: 'var(--mint-soft)', textAlign: 'center' }}>
+        <div className="stamp" style={{ borderColor: 'var(--mint)', color: 'var(--mint)',
+                                        margin: '4px auto 18px' }}>
+          In<br />verifica
+        </div>
+        <h2 className="display" style={{ fontSize: 20 }}>{gm.missions.titolo}</h2>
+        <p className="muted" style={{ margin: '10px 0 0' }}>
           Prova caricata. Ti diciamo a breve se è tutto a posto.
         </p>
       </div>
     );
   }
 
-  const scaduta = new Date(gm.scadenza) < new Date();
+  const r = rimasto(gm.scadenza);
+  const scaduta = !r;
+
+  if (scaduta) {
+    return (
+      <div className="card d3">
+        <p className="eyebrow" style={{ color: 'var(--coral)' }}>Scaduta</p>
+        <h2 className="display" style={{ fontSize: 20, marginTop: 8 }}>{gm.missions.titolo}</h2>
+        <p className="muted" style={{ margin: '10px 0 0', lineHeight: 1.5 }}>
+          Questa settimana non ce l’avete fatta. La prossima si riparte, senza rancore.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="card">
-      <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em',
-                  color: scaduta ? 'var(--stamp)' : 'var(--ink-soft)', margin: '0 0 8px' }}>
-        {scaduta ? 'Scaduta' : giorniRimasti(gm.scadenza)} · {gm.missions.punti} punti
-      </p>
-      <h2>{gm.missions.titolo}</h2>
-      <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink-soft)', marginTop: 0 }}>
+    <div className="card d3" style={{ background: 'var(--coral)', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.7)' }}>Missione della settimana</p>
+        <span style={{ background: 'rgba(255,255,255,.2)', padding: '5px 11px',
+                       borderRadius: 'var(--r-full)', fontSize: 12, fontWeight: 800 }}>
+          {r}
+        </span>
+      </div>
+
+      <h2 className="display" style={{ fontSize: 26, marginTop: 12 }}>{gm.missions.titolo}</h2>
+      <p style={{ fontSize: 15, lineHeight: 1.55, opacity: .88, marginTop: 10 }}>
         {gm.missions.descrizione}
       </p>
+      <p style={{ fontSize: 13, fontWeight: 800, opacity: .8, margin: '0 0 4px' }}>
+        +{gm.missions.punti} punti al gruppo
+      </p>
 
-      {!scaduta && (
-        <>
-          <label htmlFor="foto">Foto di gruppo</label>
-          <input id="foto" type="file" accept="image/*" capture="environment"
-                 onChange={(e) => setFile(e.target.files[0])}
-                 style={{ padding: 10, fontSize: 14 }} />
+      <div style={{ background: 'rgba(255,255,255,.14)', borderRadius: 'var(--r-md)',
+                    padding: 18, marginTop: 20 }}>
+        <label style={{ color: 'rgba(255,255,255,.75)', margin: '0 0 10px' }}>La prova</label>
 
-          <label>Chi c'era?</label>
-          <div className="chip-row">
-            {membri.map((m) => (
-              <button type="button" key={m.id}
-                      className={presenti.includes(m.id) ? 'chip sel' : 'chip'}
-                      onClick={() => toggle(m.id)}>
-                {m.nome}
-              </button>
-            ))}
-          </div>
-          <p className="hint">I punti vanno solo a chi c'era davvero. Minimo 2 persone.</p>
+        <label htmlFor="foto" style={{
+          display: 'block', textAlign: 'center', padding: anteprima ? 0 : '26px 16px',
+          background: 'rgba(255,255,255,.16)', borderRadius: 'var(--r-sm)',
+          border: '2px dashed rgba(255,255,255,.4)', cursor: 'pointer', color: '#fff',
+          margin: 0, textTransform: 'none', letterSpacing: 0, fontSize: 14, overflow: 'hidden',
+        }}>
+          {anteprima
+            ? <img src={anteprima} alt="" style={{ width: '100%', display: 'block', maxHeight: 220,
+                                                    objectFit: 'cover' }} />
+            : <>Scatta o carica la foto di gruppo</>}
+        </label>
+        <input id="foto" type="file" accept="image/*" capture="environment"
+               onChange={scegli} style={{ display: 'none' }} />
 
-          {err && <p className="err">{err}</p>}
-
-          <button className="btn" onClick={invia} disabled={invio}>
-            {invio ? 'Carico…' : 'Carica la prova'}
-          </button>
-        </>
-      )}
-
-      {scaduta && (
-        <p className="muted" style={{ margin: 0 }}>
-          Questa settimana non ce l'avete fatta. La prossima si riparte.
+        <label style={{ color: 'rgba(255,255,255,.75)', marginTop: 20 }}>Chi c’era?</label>
+        <div className="chip-row">
+          {membri.map((m) => (
+            <button type="button" key={m.id} onClick={() => toggle(m.id)}
+                    className="chip"
+                    style={presenti.includes(m.id)
+                      ? { background: '#fff', color: 'var(--coral)', borderColor: '#fff', transform: 'scale(1.04)' }
+                      : { background: 'transparent', color: 'rgba(255,255,255,.8)',
+                          borderColor: 'rgba(255,255,255,.4)' }}>
+              {m.nome}
+            </button>
+          ))}
+        </div>
+        <p style={{ fontSize: 12.5, opacity: .75, marginTop: 10, marginBottom: 0 }}>
+          I punti vanno solo a chi c’era. Minimo 2 persone.
         </p>
-      )}
+      </div>
+
+      {err && <p className="err" style={{ color: '#fff' }}>{err}</p>}
+
+      <button className="btn" onClick={invia} disabled={invio}
+              style={{ background: '#fff', color: 'var(--coral)', boxShadow: '0 6px 0 -1px rgba(0,0,0,.18)' }}>
+        {invio ? 'Carico…' : 'Consegna la prova'}
+      </button>
     </div>
   );
 }

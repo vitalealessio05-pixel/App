@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 
-export default function Login() {
+export default function Register() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [stato, setStato] = useState('idle');
@@ -19,17 +19,15 @@ export default function Login() {
       const { error } = await supabase().auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
-          shouldCreateUser: false,
+          shouldCreateUser: true,
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (error) {
         const m = (error.message || '').toLowerCase();
-        if (m.includes('signups not allowed') || m.includes('not found') || m.includes('user not found')) {
-          setErr('Questa mail non risulta iscritta. Registrati prima.');
-        } else if (m.includes('rate limit') || error.status === 429) {
-          setErr('Troppi tentativi. Riprova tra un po’.');
+        if (m.includes('rate limit') || error.status === 429) {
+          setErr('Troppe mail inviate. Riprova tra un po’.');
         } else {
           setErr(error.message);
         }
@@ -47,14 +45,14 @@ export default function Login() {
     return (
       <div>
         <div className="brand"><span className="brand-dot" />Missio</div>
-        <div className="card card-dark" style={{ marginTop: 30, padding: 30 }}>
-          <div className="stamp" style={{ borderColor: 'var(--sun)', color: 'var(--sun)', marginBottom: 22 }}>
-            Link<br />inviato
+        <div className="card card-coral" style={{ marginTop: 30, padding: 30 }}>
+          <div className="stamp" style={{ borderColor: '#fff', color: '#fff', marginBottom: 22 }}>
+            Quasi<br />dentro
           </div>
-          <h1 className="display" style={{ fontSize: 30 }}>Controlla<br />la mail.</h1>
-          <p style={{ fontSize: 15, lineHeight: 1.55, opacity: .75, marginTop: 14, marginBottom: 0 }}>
-            Il link è partito verso <b style={{ color: 'var(--sun)' }}>{email}</b>. Aprilo da questo
-            telefono e sei dentro.
+          <h1 className="display" style={{ fontSize: 30 }}>Ti abbiamo<br />scritto.</h1>
+          <p style={{ fontSize: 15, lineHeight: 1.55, opacity: .85, marginTop: 14, marginBottom: 0 }}>
+            Apri il link che è arrivato a <b>{email}</b> da questo telefono. Poi ti chiediamo
+            due cose sul tuo corso e sei dentro.
           </p>
         </div>
         <p className="hint" style={{ textAlign: 'center' }}>Non arriva? Controlla lo spam.</p>
@@ -70,26 +68,27 @@ export default function Login() {
         <button type="button" className="btn-text" onClick={() => router.push('/')}>Indietro</button>
       </div>
 
-      <p className="eyebrow" style={{ marginTop: 44 }}>Bentornato</p>
-      <h1 className="display" style={{ marginTop: 10 }}>Accedi.</h1>
+      <p className="eyebrow" style={{ marginTop: 44 }}>Nuovo qui</p>
+      <h1 className="display" style={{ marginTop: 10 }}>Registrati.</h1>
       <p className="sub">
-        Metti la mail con cui ti sei registrato. Ti mandiamo un link: niente password.
+        Serve solo una mail. Nessuna password da inventare, nessun profilo da riempire.
       </p>
 
       <label htmlFor="email">Email</label>
       <input id="email" type="email" required value={email} autoComplete="email"
-             onChange={(e) => setEmail(e.target.value)} placeholder="la tua mail" />
+             onChange={(e) => setEmail(e.target.value)} placeholder="nome@studenti.uniroma1.it" />
+      <p className="hint">Se ne hai una dell’università, usa quella: ci aiuta a capire che sei uno studente vero.</p>
 
       {err && <p className="err">{err}</p>}
 
-      <button className="btn btn-iris" type="submit" disabled={stato === 'invio' || !email}>
-        {stato === 'invio' ? 'Invio…' : 'Mandami il link'}
+      <button className="btn btn-coral" type="submit" disabled={stato === 'invio' || !email}>
+        {stato === 'invio' ? 'Invio…' : 'Crea il mio account'}
       </button>
 
       <button type="button" className="btn-text"
               style={{ display: 'block', margin: '20px auto 0' }}
-              onClick={() => router.push('/register')}>
-        Non hai un account? Registrati
+              onClick={() => router.push('/login')}>
+        Hai già un account? Accedi
       </button>
     </form>
   );
