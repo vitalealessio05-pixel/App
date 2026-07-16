@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
+import Splash from './Splash';
 
 const SLIDE = [
   {
@@ -139,9 +140,15 @@ function Art({ tipo }) {
 export default function Intro() {
   const router = useRouter();
   const [pronto, setPronto] = useState(false);
+  const [minimoPassato, setMinimoPassato] = useState(false);
   const [i, setI] = useState(0);
   const [finito, setFinito] = useState(false);
   const touch = useRef(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMinimoPassato(true), 1300);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     async function check() {
@@ -179,10 +186,19 @@ export default function Intro() {
     touch.current = null;
   }
 
-  if (!pronto) return null;
+  const mostraApp = pronto && minimoPassato;
+  const [splashVia, setSplashVia] = useState(false);
 
-  if (finito) {
-    return (
+  useEffect(() => {
+    if (!mostraApp) return;
+    const t = setTimeout(() => setSplashVia(true), 400);
+    return () => clearTimeout(t);
+  }, [mostraApp]);
+
+  let contenuto = null;
+
+  if (mostraApp && finito) {
+    contenuto = (
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
@@ -224,49 +240,55 @@ export default function Intro() {
         </p>
       </div>
     );
+  } else if (mostraApp) {
+    const s = SLIDE[i];
+    contenuto = (
+      <div onTouchStart={onStart} onTouchEnd={onEnd}
+           style={{ minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+          <button className="btn-text" onClick={chiudi}>Salta</button>
+        </div>
+
+        <div key={i} className="card" style={{
+          background: s.bg, color: s.fg, marginTop: 24, padding: '30px 26px 34px',
+          borderRadius: 32, flex: 'none',
+        }}>
+          <Art tipo={s.art} />
+          <p className="eyebrow" style={{ color: s.fg, opacity: .65, marginTop: 22 }}>{s.eyebrow}</p>
+          <h1 className="display" style={{ fontSize: 32, marginTop: 10, whiteSpace: 'pre-line' }}>
+            {s.titolo}
+          </h1>
+          <p style={{ fontSize: 15, lineHeight: 1.55, marginTop: 14, marginBottom: 0, opacity: .82 }}>
+            {s.testo}
+          </p>
+        </div>
+
+        <div style={{ flex: 1 }} />
+
+        <div style={{ display: 'flex', gap: 7, justifyContent: 'center', margin: '4px 0 18px' }}>
+          {SLIDE.map((_, k) => (
+            <button key={k} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`}
+                    style={{
+                      width: k === i ? 26 : 8, height: 8, borderRadius: 4, border: 'none',
+                      background: k === i ? 'var(--void)' : 'rgba(13,10,30,.18)',
+                      transition: 'width .3s var(--spring), background .3s', padding: 0,
+                    }} />
+          ))}
+        </div>
+
+        <button className="btn" style={{ marginTop: 0 }} onClick={avanti}>
+          {i === SLIDE.length - 1 ? 'Iniziamo' : 'Avanti'}
+        </button>
+      </div>
+    );
   }
 
-  const s = SLIDE[i];
-
   return (
-    <div onTouchStart={onStart} onTouchEnd={onEnd}
-         style={{ minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
-        <button className="btn-text" onClick={chiudi}>Salta</button>
-      </div>
-
-      <div key={i} className="card" style={{
-        background: s.bg, color: s.fg, marginTop: 24, padding: '30px 26px 34px',
-        borderRadius: 32, flex: 'none',
-      }}>
-        <Art tipo={s.art} />
-        <p className="eyebrow" style={{ color: s.fg, opacity: .65, marginTop: 22 }}>{s.eyebrow}</p>
-        <h1 className="display" style={{ fontSize: 32, marginTop: 10, whiteSpace: 'pre-line' }}>
-          {s.titolo}
-        </h1>
-        <p style={{ fontSize: 15, lineHeight: 1.55, marginTop: 14, marginBottom: 0, opacity: .82 }}>
-          {s.testo}
-        </p>
-      </div>
-
-      <div style={{ flex: 1 }} />
-
-      <div style={{ display: 'flex', gap: 7, justifyContent: 'center', margin: '4px 0 18px' }}>
-        {SLIDE.map((_, k) => (
-          <button key={k} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`}
-                  style={{
-                    width: k === i ? 26 : 8, height: 8, borderRadius: 4, border: 'none',
-                    background: k === i ? 'var(--void)' : 'rgba(13,10,30,.18)',
-                    transition: 'width .3s var(--spring), background .3s', padding: 0,
-                  }} />
-        ))}
-      </div>
-
-      <button className="btn" style={{ marginTop: 0 }} onClick={avanti}>
-        {i === SLIDE.length - 1 ? 'Iniziamo' : 'Avanti'}
-      </button>
-    </div>
+    <>
+      {!splashVia && <Splash uscendo={mostraApp} />}
+      {contenuto}
+    </>
   );
 }
