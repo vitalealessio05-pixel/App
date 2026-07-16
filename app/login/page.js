@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import CampoPassword from '../CampoPassword';
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
   const [stato, setStato] = useState('idle');
   const [err, setErr] = useState('');
 
@@ -16,51 +18,37 @@ export default function Login() {
     setStato('invio');
 
     try {
-      const { error } = await supabase().auth.signInWithOtp({
+      const sb = supabase();
+      const { data, error } = await sb.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+        password: pw,
       });
 
       if (error) {
         const m = (error.message || '').toLowerCase();
-        if (m.includes('signups not allowed') || m.includes('not found') || m.includes('user not found')) {
-          setErr('Questa mail non risulta iscritta. Registrati prima.');
-        } else if (m.includes('rate limit') || error.status === 429) {
-          setErr('Troppi tentativi. Riprova tra un po’.');
+        if (m.includes('invalid login credentials')) {
+          setErr('Mail o password sbagliate.');
+        } else if (m.includes('email not confirmed')) {
+          setErr('Devi ancora confermare la mail. Apri il link che ti abbiamo mandato.');
         } else {
           setErr(error.message);
         }
         setStato('idle');
         return;
       }
-      setStato('inviato');
+
+      const { data: p } = await sb
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      router.replace(p ? '/home' : '/onboarding');
     } catch (e) {
+      console.error(e);
       setErr(e?.message || 'Qualcosa non ha funzionato.');
       setStato('idle');
     }
-  }
-
-  if (stato === 'inviato') {
-    return (
-      <div>
-        <div className="brand"><span className="brand-dot" />Missio</div>
-        <div className="card card-dark" style={{ marginTop: 30, padding: 30 }}>
-          <div className="stamp" style={{ borderColor: 'var(--sun)', color: 'var(--sun)', marginBottom: 22 }}>
-            Link<br />inviato
-          </div>
-          <h1 className="display" style={{ fontSize: 30 }}>Controlla<br />la mail.</h1>
-          <p style={{ fontSize: 15, lineHeight: 1.55, opacity: .75, marginTop: 14, marginBottom: 0 }}>
-            Il link è partito verso <b style={{ color: 'var(--sun)' }}>{email}</b>. Aprilo da questo
-            telefono e sei dentro.
-          </p>
-        </div>
-        <p className="hint" style={{ textAlign: 'center' }}>Non arriva? Controlla lo spam.</p>
-        <button className="btn-ghost" onClick={() => setStato('idle')}>Usa un’altra mail</button>
-      </div>
-    );
   }
 
   return (
@@ -70,24 +58,34 @@ export default function Login() {
         <button type="button" className="btn-text" onClick={() => router.push('/')}>Indietro</button>
       </div>
 
-      <p className="eyebrow" style={{ marginTop: 44 }}>Bentornato</p>
+      <p className="eyebrow" style={{ marginTop: 40 }}>Bentornato</p>
       <h1 className="display" style={{ marginTop: 10 }}>Accedi.</h1>
-      <p className="sub">
-        Metti la mail con cui ti sei registrato. Ti mandiamo un link: niente password.
-      </p>
+      <p className="sub">Mail e password. Nessuna mail da aspettare.</p>
 
-      <label htmlFor="email">Email</label>
-      <input id="email" type="email" required value={email} autoComplete="email"
-             onChange={(e) => setEmail(e.target.value)} placeholder="la tua mail" />
+      <div className="card d1">
+        <label htmlFor="email" style={{ marginTop: 0 }}>Email</label>
+        <input id="email" type="email" required value={email} autoComplete="email"
+               onChange={(e) => setEmail(e.target.value)} placeholder="la tua mail" />
+
+        <label htmlFor="pw">Password</label>
+        <CampoPassword id="pw" value={pw} onChange={(e) => setPw(e.target.value)}
+                       placeholder="La tua password" autoComplete="current-password" />
+      </div>
 
       {err && <p className="err">{err}</p>}
 
-      <button className="btn btn-iris" type="submit" disabled={stato === 'invio' || !email}>
-        {stato === 'invio' ? 'Invio…' : 'Mandami il link'}
+      <button className="btn btn-iris" type="submit" disabled={stato === 'invio' || !email || !pw}>
+        {stato === 'invio' ? 'Entro…' : 'Entra'}
       </button>
 
       <button type="button" className="btn-text"
-              style={{ display: 'block', margin: '20px auto 0' }}
+              style={{ display: 'block', margin: '18px auto 0' }}
+              onClick={() => router.push('/recupera')}>
+        Password dimenticata?
+      </button>
+
+      <button type="button" className="btn-text"
+              style={{ display: 'block', margin: '2px auto 0' }}
               onClick={() => router.push('/register')}>
         Non hai un account? Registrati
       </button>
