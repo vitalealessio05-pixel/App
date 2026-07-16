@@ -62,6 +62,11 @@ export default function Admin() {
     const primo = attesa.find((p) => p.id === sel[0]);
     if (!primo) { setMsg('Errore interno: persona non trovata, ricarica la pagina.'); return; }
 
+    const segmenti = new Set(sel.map((id) => attesa.find((p) => p.id === id)?.segment_key));
+    if (segmenti.size > 1) {
+      setMsg('Attenzione: stai mettendo insieme persone di segmenti diversi.');
+    }
+
     const { data: g, error } = await sb
       .from('groups')
       .insert({ segment_key: primo.segment_key, nome: `Gruppo ${primo.corso}` })
@@ -80,7 +85,7 @@ export default function Admin() {
 
     if (errMembri) {
       console.error('aggiunta membri:', errMembri);
-      setMsg('Gruppo creato ma senza membri (' + errMembri.message + '). Contattami con questo messaggio.');
+      setMsg('Gruppo creato ma senza membri (' + errMembri.message + ').');
       carica();
       return;
     }
@@ -94,7 +99,7 @@ export default function Admin() {
     const sb = supabase();
     const scadenza = new Date(Date.now() + 4 * 86400000).toISOString();
     const { error } = await sb.from('group_missions').insert({ group_id: groupId, mission_id: missionId, scadenza });
-    setMsg(error ? error.message : 'Missione assegnata.');
+    setMsg(error ? 'Assegnazione fallita: ' + error.message : 'Missione assegnata.');
     carica();
   }
 
@@ -134,7 +139,7 @@ export default function Admin() {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   }
 
-  if (!ok) return <p className="muted">Controllo permessi…</p>;
+  if (!ok) return <div className="admin-wrap"><p className="muted">Controllo permessi…</p></div>;
 
   const perSegmento = attesa.reduce((acc, p) => {
     (acc[p.segment_key] = acc[p.segment_key] || []).push(p);
@@ -142,85 +147,119 @@ export default function Admin() {
   }, {});
 
   return (
-    <div>
-      <div className="brand">Missio · admin</div>
-      {msg && <p className="ok-msg">{msg}</p>}
-
-      <h2>In attesa ({attesa.length})</h2>
-      <p className="sub">Seleziona 3–4 persone dello stesso segmento e crea il gruppo.</p>
-
-      {Object.entries(perSegmento).map(([seg, persone]) => (
-        <div className="card" key={seg}>
-          <p style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em',
-                      color: 'var(--ink-soft)', margin: '0 0 12px' }}>
-            {persone[0].corso} · {persone[0].campus} — {persone.length} in attesa
-          </p>
-          {persone.map((p) => (
-            <label key={p.id} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              textTransform: 'none', margin: '0 0 8px', padding: '8px 10px',
-              borderRadius: 10, fontSize: 14, fontWeight: 400, color: 'var(--ink)',
-              background: sel.includes(p.id) ? 'var(--iris-soft, #EEEBFF)' : 'transparent',
-              transition: 'background .15s ease',
-            }}>
-              <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggleSel(p.id)} />
-              <span>
-                {p.nome} · {p.disponibilita} · {p.anno}° anno
-                {p.conosce_nome && (
-                  <span style={{ color: 'var(--stamp)' }}> — conosce: {p.conosce_nome}</span>
-                )}
-              </span>
-            </label>
-          ))}
+    <div className="admin-wrap">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    marginBottom: 24 }}>
+        <div className="brand" style={{ marginBottom: 0 }}>
+          <span className="brand-dot" />Missio · admin
         </div>
-      ))}
+        <button className="btn-text" onClick={() => router.push('/home')}>Vista studente</button>
+      </div>
 
-      {sel.length > 0 && (
-        <button className="btn" onClick={creaGruppo}>
-          Crea gruppo con {sel.length} {sel.length === 1 ? 'persona' : 'persone'}
-        </button>
-      )}
+      {msg && <div className="admin-msg">{msg}</div>}
 
-      <h2 style={{ marginTop: 40 }}>Gruppi attivi ({gruppi.length})</h2>
-      {gruppi.map((g) => (
-        <div className="card" key={g.id}>
-          <p style={{ margin: '0 0 8px', fontWeight: 500 }}>{g.nome}</p>
-          <p className="muted" style={{ marginTop: 0 }}>
-            {(g.group_members || []).map((m) => m.profiles?.nome).join(' · ')}
-          </p>
+      <div className="admin-grid">
 
-          <label style={{ marginTop: 12 }}>Link chat (Telegram/WhatsApp)</label>
-          <input defaultValue={g.chat_link || ''} placeholder="https://t.me/..."
-                 onBlur={(e) => e.target.value !== (g.chat_link || '') && salvaChat(g.id, e.target.value)} />
+        {/* colonna sinistra: formazione gruppi */}
+        <div className="admin-col">
+          <div className="admin-card">
+            <p className="admin-h">In attesa <span className="admin-count">{attesa.length}</span></p>
+            <p className="admin-meta">Spunta da 2 a 4 persone dello stesso segmento, poi crea il gruppo.</p>
 
-          <label style={{ marginTop: 12 }}>Assegna missione</label>
-          <select defaultValue="" onChange={(e) => e.target.value && assegna(g.id, e.target.value)}>
-            <option value="">Scegli…</option>
-            {missioni.map((m) => <option key={m.id} value={m.id}>{m.titolo}</option>)}
-          </select>
-        </div>
-      ))}
+            {attesa.length === 0 && (
+              <p className="muted" style={{ marginTop: 18 }}>Nessuno in attesa. Tutti hanno un gruppo.</p>
+            )}
 
-      <h2 style={{ marginTop: 40 }}>Da verificare ({daVerificare.length})</h2>
-      {daVerificare.length === 0 && <p className="muted">Niente in coda.</p>}
-      {daVerificare.map((s) => (
-        <div className="card" key={s.id}>
-          <p style={{ margin: '0 0 6px', fontWeight: 500 }}>{s.group_missions?.missions?.titolo}</p>
-          <p className="muted" style={{ marginTop: 0 }}>
-            Presenti ({s.submission_presenze?.length || 0}):{' '}
-            {(s.submission_presenze || []).map((p) => p.profiles?.nome).join(', ')}
-          </p>
-          <button className="btn-ghost" onClick={() => vediFoto(s.foto_path)}>Vedi foto</button>
-          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <button className="btn" style={{ marginTop: 0 }} onClick={() => approva(s)}>Approva</button>
-            <button className="btn-ghost" style={{ marginTop: 0 }} onClick={() => rifiuta(s)}>Rifiuta</button>
+            {Object.entries(perSegmento).map(([seg, persone]) => (
+              <div key={seg}>
+                <p className="admin-seg">
+                  {persone[0].corso} · {persone[0].campus} — {persone.length}
+                </p>
+                {persone.map((p) => (
+                  <label key={p.id} className={sel.includes(p.id) ? 'admin-row sel' : 'admin-row'}>
+                    <input type="checkbox" checked={sel.includes(p.id)}
+                           onChange={() => toggleSel(p.id)} />
+                    <span style={{ flex: 1 }}>
+                      <b>{p.nome}</b>
+                      <span className="admin-meta"> · {p.disponibilita} · {p.anno}° anno</span>
+                      {p.conosce_nome && (
+                        <span style={{ color: 'var(--coral)', fontWeight: 700, fontSize: 12 }}>
+                          {' '}— conosce: {p.conosce_nome}
+                        </span>
+                      )}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            ))}
+
+            {sel.length > 0 && (
+              <div className="admin-bar">
+                <button className="btn btn-iris" style={{ marginTop: 0 }} onClick={creaGruppo}>
+                  Crea gruppo con {sel.length} {sel.length === 1 ? 'persona' : 'persone'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
-      ))}
 
-      <button className="btn-ghost" style={{ marginTop: 40 }} onClick={() => router.push('/home')}>
-        Torna alla home
-      </button>
+        {/* colonna destra: verifiche e gruppi attivi */}
+        <div className="admin-col admin-sticky">
+
+          <div className="admin-card">
+            <p className="admin-h">Da verificare <span className="admin-count">{daVerificare.length}</span></p>
+            {daVerificare.length === 0 && <p className="muted" style={{ marginTop: 12 }}>Niente in coda.</p>}
+            {daVerificare.map((s) => (
+              <div key={s.id} style={{ borderTop: '1px solid var(--line)', paddingTop: 14, marginTop: 14 }}>
+                <p style={{ margin: 0, fontWeight: 800 }}>{s.group_missions?.missions?.titolo}</p>
+                <p className="admin-meta" style={{ margin: '4px 0 10px' }}>
+                  Presenti ({s.submission_presenze?.length || 0}):{' '}
+                  {(s.submission_presenze || []).map((p) => p.profiles?.nome).join(', ')}
+                </p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn-ghost" style={{ marginTop: 0 }}
+                          onClick={() => vediFoto(s.foto_path)}>Vedi foto</button>
+                  <button className="btn" style={{ marginTop: 0 }}
+                          onClick={() => approva(s)}>Approva</button>
+                  <button className="btn-ghost" style={{ marginTop: 0 }}
+                          onClick={() => rifiuta(s)}>Rifiuta</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="admin-card">
+            <p className="admin-h">Gruppi attivi <span className="admin-count">{gruppi.length}</span></p>
+            {gruppi.length === 0 && <p className="muted" style={{ marginTop: 12 }}>Ancora nessun gruppo.</p>}
+            {gruppi.map((g) => (
+              <div key={g.id} style={{ borderTop: '1px solid var(--line)', paddingTop: 14, marginTop: 14 }}>
+                <p style={{ margin: 0, fontWeight: 800 }}>{g.nome}</p>
+                <p className="admin-meta" style={{ margin: '4px 0 10px' }}>
+                  {(g.group_members || []).map((m) => m.profiles?.nome).join(' · ')}
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div>
+                    <label style={{ marginTop: 0 }}>Link chat</label>
+                    <input defaultValue={g.chat_link || ''} placeholder="https://t.me/..."
+                           style={{ padding: '10px 12px', fontSize: 14 }}
+                           onBlur={(e) => e.target.value !== (g.chat_link || '') && salvaChat(g.id, e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ marginTop: 0 }}>Assegna missione</label>
+                    <select defaultValue="" style={{ padding: '10px 12px', fontSize: 14 }}
+                            onChange={(e) => e.target.value && assegna(g.id, e.target.value)}>
+                      <option value="">Scegli…</option>
+                      {missioni.map((m) => <option key={m.id} value={m.id}>{m.titolo}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

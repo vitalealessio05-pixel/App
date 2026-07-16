@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import CampoPassword from '../CampoPassword';
+import BottoneGoogle from '../BottoneGoogle';
 
 export default function Register() {
   const router = useRouter();
@@ -94,8 +95,17 @@ export default function Register() {
       <p className="eyebrow" style={{ marginTop: 40 }}>Nuovo qui</p>
       <h1 className="display" style={{ marginTop: 10 }}>Registrati.</h1>
       <p className="sub">
-        Mail e password. Confermi una volta con un link, poi entri sempre con la password.
+        Un tap con Google, oppure mail e password.
       </p>
+
+      <BottoneGoogle testo="Registrati con Google" />
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '22px 0 4px' }}>
+        <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+                       letterSpacing: '.1em' }}>OPPURE</span>
+        <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+      </div>
 
       <div className="card d1">
         <label htmlFor="email" style={{ marginTop: 0 }}>Email</label>

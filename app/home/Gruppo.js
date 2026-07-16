@@ -25,6 +25,8 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
   const [storico, setStorico] = useState([]);
   const [caricando, setCaricando] = useState(true);
 
+  if (!profilo || !gruppo) return <p className="muted">Un attimo…</p>;
+
   const carica = useCallback(async () => {
     const sb = supabase();
 

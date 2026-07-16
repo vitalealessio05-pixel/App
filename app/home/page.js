@@ -63,7 +63,7 @@ export default function Home() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Missio</div>
-        <button className="btn-text" onClick={esci}>Esci</button>
+        <button className="btn-text" onClick={() => router.push('/profilo')}>Profilo</button>
       </div>
 
       <div style={{ marginTop: 28 }}>

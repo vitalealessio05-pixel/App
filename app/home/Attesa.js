@@ -7,6 +7,8 @@ export default function Attesa({ profilo, inAttesa }) {
   const [copiato, setCopiato] = useState(false);
   const [anim, setAnim] = useState(0);
 
+  if (!profilo) return <p className="muted">Un attimo…</p>;
+
   const mancano = Math.max(0, SOGLIA - inAttesa);
   const pct = Math.min(1, inAttesa / SOGLIA);
   const C = 2 * Math.PI * 58;
@@ -28,7 +30,7 @@ export default function Attesa({ profilo, inAttesa }) {
 
   return (
     <div>
-      <p className="eyebrow">Ciao {profilo.nome}</p>
+      <p className="eyebrow">Ciao {profilo?.nome || 'di nuovo'}</p>
       <h1 className="display" style={{ marginTop: 10 }}>
         {mancano > 0 ? 'Stiamo\nradunando.' : 'Ci siete\nquasi.'}
       </h1>
@@ -38,7 +40,7 @@ export default function Attesa({ profilo, inAttesa }) {
 
       <div className="card card-dark d1" style={{ textAlign: 'center', padding: '30px 24px' }}>
         <p className="eyebrow" style={{ color: 'rgba(255,255,255,.5)' }}>
-          {profilo.corso} · {profilo.campus}
+          {profilo?.corso} · {profilo?.campus}
         </p>
 
         <div style={{ width: 144, height: 144, margin: '20px auto 4px', position: 'relative' }}>
