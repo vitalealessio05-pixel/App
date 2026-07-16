@@ -1,69 +1,178 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [stato, setStato] = useState('idle');
+const ALTRO = 'Altro (scrivi)';
+
+const ATENEI = {
+  'Sapienza Università di Roma': {
+    campus: ['Città Universitaria', 'San Pietro in Vincoli', 'Via Ariosto', 'Ostiense', 'Polo Pontino'],
+    corsi: ['Ingegneria Informatica', 'Ingegneria Gestionale', 'Comunicazione', 'Giurisprudenza',
+            'Economia', 'Psicologia', 'Lettere', 'Medicina', 'Architettura'],
+  },
+  'Università della Tuscia': {
+    campus: ['Riello', 'Santa Maria in Gradi', 'San Carlo'],
+    corsi: ['Scienze Agrarie', 'Economia Aziendale', 'Beni Culturali', 'Scienze Biologiche', 'Informatica'],
+  },
+};
+
+function pulisci(s) {
+  return (s || '').trim().replace(/\s+/g, ' ');
+}
+
+export default function Onboarding() {
+  const router = useRouter();
+
+  const [nome, setNome] = useState('');
+  const [ateneo, setAteneo] = useState('Sapienza Università di Roma');
+  const [ateneoLibero, setAteneoLibero] = useState('');
+  const [campus, setCampus] = useState('');
+  const [campusLibero, setCampusLibero] = useState('');
+  const [corso, setCorso] = useState('');
+  const [corsoLibero, setCorsoLibero] = useState('');
+  const [anno, setAnno] = useState(1);
+  const [dispo, setDispo] = useState('');
+  const [conosce, setConosce] = useState('');
+  const [salvo, setSalvo] = useState(false);
   const [err, setErr] = useState('');
 
-  async function invia(e) {
+  const ateneoAltro = ateneo === ALTRO;
+  const opzioni = ATENEI[ateneo];
+
+  useEffect(() => {
+    if (ateneoAltro) {
+      setCampus(ALTRO);
+      setCorso(ALTRO);
+    } else {
+      setCampus(opzioni.campus[0]);
+      setCorso(opzioni.corsi[0]);
+    }
+    setCampusLibero('');
+    setCorsoLibero('');
+  }, [ateneo]);
+
+  const campusAltro = ateneoAltro || campus === ALTRO;
+  const corsoAltro = ateneoAltro || corso === ALTRO;
+
+  const vAteneo = ateneoAltro ? pulisci(ateneoLibero) : ateneo;
+  const vCampus = campusAltro ? pulisci(campusLibero) : campus;
+  const vCorso = corsoAltro ? pulisci(corsoLibero) : corso;
+
+  const completo = pulisci(nome) && dispo && vAteneo && vCampus && vCorso;
+
+  async function salva(e) {
     e.preventDefault();
     setErr('');
-    setStato('invio');
+    setSalvo(true);
 
-    const { error } = await supabase().auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    const sb = supabase();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { router.replace('/login'); return; }
+
+    const { error } = await sb.from('profiles').insert({
+      id: session.user.id,
+      nome: pulisci(nome),
+      ateneo: vAteneo,
+      campus: vCampus,
+      corso: vCorso,
+      anno: Number(anno),
+      disponibilita: dispo,
+      conosce_nome: pulisci(conosce) || null,
     });
 
-    if (error) {
-      setErr(error.message);
-      setStato('idle');
-    } else {
-      setStato('inviato');
-    }
-  }
-
-  if (stato === 'inviato') {
-    return (
-      <div>
-        <div className="brand">Missio</div>
-        <h1>Controlla la mail</h1>
-        <p className="sub">
-          Abbiamo mandato un link a <b>{email}</b>. Aprilo da questo telefono per entrare.
-          Niente password da ricordare.
-        </p>
-        <p className="hint">Non arriva? Guarda nello spam, oppure riprova tra un minuto.</p>
-        <button className="btn-ghost" onClick={() => setStato('idle')}>
-          Usa un'altra mail
-        </button>
-      </div>
-    );
+    if (error) { setErr(error.message); setSalvo(false); return; }
+    router.replace('/home');
   }
 
   return (
-    <form onSubmit={invia}>
+    <form onSubmit={salva}>
       <div className="brand">Missio</div>
-      <h1>Entra</h1>
-      <p className="sub">Ti mandiamo un link via mail. Nessuna password.</p>
+      <h1>Dicci chi sei</h1>
+      <p className="sub">
+        Serve per metterti con persone del tuo corso, che girano negli stessi posti.
+      </p>
 
-      <label htmlFor="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="nome@studenti.uniroma1.it"
-        autoComplete="email"
-      />
+      <label htmlFor="nome">Nome</label>
+      <input id="nome" required value={nome} onChange={(e) => setNome(e.target.value)}
+             placeholder="Come ti chiami" />
+
+      <label htmlFor="ateneo">Ateneo</label>
+      <select id="ateneo" value={ateneo} onChange={(e) => setAteneo(e.target.value)}>
+        {Object.keys(ATENEI).map((a) => <option key={a}>{a}</option>)}
+        <option>{ALTRO}</option>
+      </select>
+      {ateneoAltro && (
+        <>
+          <input style={{ marginTop: 8 }} value={ateneoLibero}
+                 onChange={(e) => setAteneoLibero(e.target.value)}
+                 placeholder="Es. Università di Bologna" />
+          <p className="hint">
+            Scrivilo per esteso, come lo scriverebbe un tuo compagno di corso: è così
+            che vi ritrovate tra voi.
+          </p>
+        </>
+      )}
+
+      <label htmlFor="campus">Campus / sede</label>
+      {!ateneoAltro && (
+        <select id="campus" value={campus} onChange={(e) => setCampus(e.target.value)}>
+          {opzioni.campus.map((c) => <option key={c}>{c}</option>)}
+          <option>{ALTRO}</option>
+        </select>
+      )}
+      {campusAltro && (
+        <input style={{ marginTop: ateneoAltro ? 0 : 8 }} value={campusLibero}
+               onChange={(e) => setCampusLibero(e.target.value)}
+               placeholder="Zona o nome della sede" />
+      )}
+
+      <label htmlFor="corso">Corso di laurea</label>
+      {!ateneoAltro && (
+        <select id="corso" value={corso} onChange={(e) => setCorso(e.target.value)}>
+          {opzioni.corsi.map((c) => <option key={c}>{c}</option>)}
+          <option>{ALTRO}</option>
+        </select>
+      )}
+      {corsoAltro && (
+        <input style={{ marginTop: ateneoAltro ? 0 : 8 }} value={corsoLibero}
+               onChange={(e) => setCorsoLibero(e.target.value)}
+               placeholder="Es. Scienze Politiche" />
+      )}
+
+      <label htmlFor="anno">Anno</label>
+      <select id="anno" value={anno} onChange={(e) => setAnno(e.target.value)}>
+        <option value={1}>Primo anno</option>
+        <option value={2}>Secondo anno</option>
+        <option value={3}>Terzo anno</option>
+        <option value={4}>Fuori corso o magistrale</option>
+      </select>
+
+      <label>Quando sei libero</label>
+      <div className="chip-row">
+        {[['settimana', 'Infrasettimanale'], ['weekend', 'Weekend'], ['entrambi', 'Entrambi']].map(([v, l]) => (
+          <button type="button" key={v}
+                  className={dispo === v ? 'chip sel' : 'chip'}
+                  onClick={() => setDispo(v)}>
+            {l}
+          </button>
+        ))}
+      </div>
+      <p className="hint">Se in un gruppo uno può solo la domenica e gli altri no, la missione muore lì.</p>
+
+      <label htmlFor="conosce">
+        Conosci già qualcuno che si sta iscrivendo?{' '}
+        <span style={{ textTransform: 'none', fontWeight: 400 }}>(facoltativo)</span>
+      </label>
+      <input id="conosce" value={conosce} onChange={(e) => setConosce(e.target.value)}
+             placeholder="Nome e cognome" />
+      <p className="hint">Serve per <b>non</b> mettervi nello stesso gruppo. L'obiettivo è conoscere gente nuova.</p>
 
       {err && <p className="err">{err}</p>}
 
-      <button className="btn" type="submit" disabled={stato === 'invio' || !email}>
-        {stato === 'invio' ? 'Invio…' : 'Mandami il link'}
+      <button className="btn" type="submit" disabled={salvo || !completo}>
+        {salvo ? 'Salvo…' : 'Conferma'}
       </button>
     </form>
   );
