@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import CampoPassword from '../CampoPassword';
 import BottoneGoogle from '../BottoneGoogle';
+import BrandMark from '../BrandMark';
 
 export default function Login() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function Login() {
   return (
     <form onSubmit={invia}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button type="button" className="btn-text" onClick={() => router.push('/')}>Indietro</button>
       </div>
 

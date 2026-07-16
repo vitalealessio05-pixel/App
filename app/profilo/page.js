@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import BrandMark from '../BrandMark';
 
 function dataIt(s) {
   try {
@@ -66,7 +67,7 @@ export default function Profilo() {
   if (caricando) {
     return (
       <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+        <div className="brand"><BrandMark />Maisola</div>
         <p className="muted">Un attimo…</p>
       </div>
     );
@@ -78,7 +79,7 @@ export default function Profilo() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button className="btn-text" onClick={() => router.push('/home')}>Indietro</button>
       </div>
 

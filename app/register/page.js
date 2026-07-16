@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import CampoPassword from '../CampoPassword';
 import BottoneGoogle from '../BottoneGoogle';
+import BrandMark from '../BrandMark';
 
 export default function Register() {
   const router = useRouter();
@@ -66,7 +67,7 @@ export default function Register() {
   if (stato === 'inviato') {
     return (
       <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+        <div className="brand"><BrandMark />Maisola</div>
         <div className="card card-coral" style={{ marginTop: 30, padding: 30 }}>
           <div className="stamp" style={{ borderColor: '#fff', color: '#fff', marginBottom: 22 }}>
             Quasi<br />dentro
@@ -88,7 +89,7 @@ export default function Register() {
   return (
     <form onSubmit={invia}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button type="button" className="btn-text" onClick={() => router.push('/')}>Indietro</button>
       </div>
 

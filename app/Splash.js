@@ -11,39 +11,35 @@ export default function Splash({ uscendo }) {
       pointerEvents: uscendo ? 'none' : 'auto',
     }}>
       <style>{`
-        @keyframes splashPop {
-          0% { transform: scale(0.3); opacity: 0; }
-          60% { transform: scale(1.08); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
+        @keyframes arcIn {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
         }
         @keyframes splashSlide {
           from { transform: translateY(10px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
-        .splash-c1 {
-          animation: splashPop .55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-        .splash-c2 {
-          animation: splashPop .55s cubic-bezier(0.34, 1.56, 0.64, 1) .12s both;
-        }
-        .splash-name {
-          animation: splashSlide .5s ease .38s both;
-        }
-        .splash-motto {
-          animation: splashSlide .5s ease .55s both;
-        }
+        .splash-arc { transform-origin: center; animation: arcIn .4s cubic-bezier(0.22,1,0.36,1) both; }
+        .splash-name { animation: splashSlide .5s ease .5s both; }
+        .splash-motto { animation: splashSlide .5s ease .65s both; }
       `}</style>
 
-      <div style={{ position: 'relative', width: 96, height: 72, marginBottom: 24 }}>
-        <div className="splash-c1" style={{
-          position: 'absolute', left: 0, top: 6, width: 60, height: 60,
-          borderRadius: '50%', background: 'var(--coral)',
-        }} />
-        <div className="splash-c2" style={{
-          position: 'absolute', left: 36, top: 6, width: 60, height: 60,
-          borderRadius: '50%', background: 'var(--iris)', opacity: 0.88,
-        }} />
-      </div>
+      <svg width="88" height="88" viewBox="0 0 100 100" style={{ marginBottom: 22 }}>
+        <g transform="translate(50,50)" fill="none" strokeLinecap="round">
+          <path className="splash-arc" style={{ animationDelay: '.18s' }}
+                d="M -6,-10 A 10,10 0 0 0 -6,10" strokeWidth="9" stroke="var(--coral)" />
+          <path className="splash-arc" style={{ animationDelay: '.30s' }}
+                d="M -6,-21 A 21,21 0 0 0 -6,21" strokeWidth="9" stroke="var(--coral)" />
+          <path className="splash-arc" style={{ animationDelay: '.42s' }}
+                d="M -6,-32 A 32,32 0 0 0 -6,32" strokeWidth="9" stroke="var(--coral)" />
+          <path className="splash-arc" style={{ animationDelay: '.18s' }}
+                d="M 6,-10 A 10,10 0 0 1 6,10" strokeWidth="9" stroke="var(--iris)" />
+          <path className="splash-arc" style={{ animationDelay: '.30s' }}
+                d="M 6,-21 A 21,21 0 0 1 6,21" strokeWidth="9" stroke="var(--iris)" />
+          <path className="splash-arc" style={{ animationDelay: '.42s' }}
+                d="M 6,-32 A 32,32 0 0 1 6,32" strokeWidth="9" stroke="var(--iris)" />
+        </g>
+      </svg>
 
       <h1 className="splash-name display" style={{ fontSize: 32, color: '#fff', margin: 0 }}>
         Maisola

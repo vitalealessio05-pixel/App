@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import Splash from './Splash';
+import BrandMark from './BrandMark';
 
 const SLIDE = [
   {
@@ -209,12 +210,7 @@ export default function Intro() {
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
-          <div style={{ position: 'relative', width: 76, height: 56 }}>
-            <div style={{ position: 'absolute', left: 0, top: 4, width: 48, height: 48,
-                          borderRadius: '50%', background: 'var(--coral)' }} />
-            <div style={{ position: 'absolute', left: 28, top: 4, width: 48, height: 48,
-                          borderRadius: '50%', background: 'var(--iris)', opacity: 0.88 }} />
-          </div>
+          <BrandMark size={64} />
         </div>
 
         <h1 className="display" style={{ fontSize: 40, textAlign: 'center', marginBottom: 10 }}>
@@ -254,7 +250,7 @@ export default function Intro() {
            style={{ minHeight: 'calc(100vh - 84px)', display: 'flex', flexDirection: 'column' }}>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+          <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
           <button className="btn-text" onClick={chiudi}>Salta</button>
         </div>
 

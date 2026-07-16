@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import BrandMark from '../BrandMark';
 
 export default function Recupera() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function Recupera() {
   if (stato === 'inviato') {
     return (
       <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+        <div className="brand"><BrandMark />Maisola</div>
         <div className="card card-dark" style={{ marginTop: 30, padding: 30 }}>
           <div className="stamp" style={{ borderColor: 'var(--sun)', color: 'var(--sun)',
                                           marginBottom: 22 }}>
@@ -62,7 +63,7 @@ export default function Recupera() {
   return (
     <form onSubmit={invia}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button type="button" className="btn-text" onClick={() => router.push('/login')}>Indietro</button>
       </div>
 

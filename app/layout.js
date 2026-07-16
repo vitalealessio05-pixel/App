@@ -2,6 +2,7 @@ import './globals.css';
 import BlobsGate from './BlobsGate';
 import FooterGate from './FooterGate';
 import AggiornamentoAuto from './AggiornamentoAuto';
+import PullToRefresh from './PullToRefresh';
 
 export const metadata = {
   title: 'Maisola',
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AggiornamentoAuto />
+        <PullToRefresh />
         <BlobsGate />
         <div className="wrap">
           {children}

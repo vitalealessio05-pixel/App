@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import BrandMark from '../BrandMark';
 
 const ALTRO = 'Altro (scrivi)';
 
@@ -109,7 +110,7 @@ export default function Onboarding() {
 
   return (
     <form onSubmit={salva}>
-      <div className="brand"><span className="brand-dot" />Maisola</div>
+      <div className="brand"><BrandMark />Maisola</div>
 
       <p className="eyebrow" style={{ marginTop: 34 }}>Ultimo passo</p>
       <h1 className="display" style={{ marginTop: 10 }}>Dicci<br />chi sei.</h1>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import CampoPassword from '../CampoPassword';
+import BrandMark from '../BrandMark';
 
 export default function NuovaPassword() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function NuovaPassword() {
   if (!valida) {
     return (
       <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+        <div className="brand"><BrandMark />Maisola</div>
         <h1 className="display" style={{ marginTop: 40 }}>Link<br />scaduto.</h1>
         <p className="sub">
           Questo link non è più valido, oppure lo stai aprendo da un dispositivo diverso da
@@ -64,7 +65,7 @@ export default function NuovaPassword() {
 
   return (
     <form onSubmit={salva}>
-      <div className="brand"><span className="brand-dot" />Maisola</div>
+      <div className="brand"><BrandMark />Maisola</div>
 
       <p className="eyebrow" style={{ marginTop: 40 }}>Ci siamo</p>
       <h1 className="display" style={{ marginTop: 10 }}>Scegli<br />la nuova.</h1>

@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import Attesa from './Attesa';
 import Gruppo from './Gruppo';
 import Notifiche from '../Notifiche';
+import BrandMark from '../BrandMark';
 
 export default function Home() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function Home() {
   if (caricando) {
     return (
       <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+        <div className="brand"><BrandMark />Maisola</div>
         <p className="muted">Un attimo…</p>
       </div>
     );
@@ -64,7 +65,7 @@ export default function Home() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button className="btn-text" onClick={() => router.push('/profilo')}>Profilo</button>
       </div>
 

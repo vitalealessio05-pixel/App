@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import BrandMark from '../BrandMark';
 
 export default function Termini() {
   const router = useRouter();
@@ -8,7 +9,7 @@ export default function Termini() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="brand" style={{ marginBottom: 0 }}><span className="brand-dot" />Maisola</div>
+        <div className="brand" style={{ marginBottom: 0 }}><BrandMark />Maisola</div>
         <button className="btn-text" onClick={() => router.back()}>Indietro</button>
       </div>
 

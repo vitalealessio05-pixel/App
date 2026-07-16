@@ -92,8 +92,14 @@ export default function Admin() {
       return;
     }
 
+    const notifica = await notificaGruppo(g.id, {
+      title: 'Il tuo gruppo è pronto!',
+      body: 'Siete stati messi insieme. Apri l’app per vedere chi c’è nel tuo gruppo.',
+      url: '/home',
+    });
+
     setSel([]);
-    setMsg('Gruppo creato con ' + sel.length + ' persone.');
+    setMsg('Gruppo creato con ' + sel.length + ' persone. Notifiche: ' + notifica.motivo);
     carica();
   }
 
