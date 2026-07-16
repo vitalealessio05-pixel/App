@@ -3,8 +3,8 @@
   "short_name": "Maisola",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F2EFE6",
-  "theme_color": "#0D0A1E",
+  "background_color": "#120E28",
+  "theme_color": "#120E28",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }

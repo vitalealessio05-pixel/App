@@ -108,7 +108,7 @@ export default function Notifiche() {
   if (stato === 'ios-non-installata') {
     return (
       <div className="card d3" style={{ background: 'var(--sun-soft)' }}>
-        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#7A5800' }}>
+        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: 'var(--sun-text)' }}>
           Per ricevere le notifiche su iPhone: tocca l'icona Condividi in Safari →
           "Aggiungi a Home". Poi apri Maisola da quell'icona, non da Safari.
         </p>

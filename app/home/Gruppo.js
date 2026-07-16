@@ -85,7 +85,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
           {membri.map((m, i) => (
             <div key={m.id} style={{
               width: 46, height: 46, borderRadius: '50%', background: COLORI[i % 4],
-              border: '3px solid #fff', marginLeft: i === 0 ? 0 : -12,
+              border: '3px solid var(--card)', marginLeft: i === 0 ? 0 : -12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14, fontWeight: 800, color: '#fff',
               animation: `rise .4s var(--spring) ${i * 0.08}s both`,
@@ -223,12 +223,12 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
   return (
     <>
       {motivoRifiuto && (
-        <div className="card d3" style={{ background: 'var(--stamp-soft, #F1DAD3)' }}>
+        <div className="card d3" style={{ background: 'var(--coral-soft)' }}>
           <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase',
                      letterSpacing: '.05em', color: 'var(--coral)' }}>
             La foto di prima non è passata
           </p>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink, #1B2A4A)' }}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink)' }}>
             {motivoRifiuto}
           </p>
         </div>

@@ -141,6 +141,7 @@ export default function Intro() {
   const router = useRouter();
   const [pronto, setPronto] = useState(false);
   const [minimoPassato, setMinimoPassato] = useState(false);
+  const [destinazione, setDestinazione] = useState(null);
   const [i, setI] = useState(0);
   const [finito, setFinito] = useState(false);
   const touch = useRef(null);
@@ -156,7 +157,7 @@ export default function Intro() {
       const { data: { session } } = await sb.auth.getSession();
       if (session) {
         const { data: p } = await sb.from('profiles').select('id').eq('id', session.user.id).maybeSingle();
-        router.replace(p ? '/home' : '/onboarding');
+        setDestinazione(p ? '/home' : '/onboarding');
         return;
       }
       if (typeof window !== 'undefined' && localStorage.getItem('missio_intro') === 'ok') {
@@ -166,6 +167,12 @@ export default function Intro() {
     }
     check();
   }, [router]);
+
+  // naviga solo quando lo splash ha avuto il suo tempo minimo, anche se il
+  // controllo sessione è finito subito (utente già loggato, tutto in cache)
+  useEffect(() => {
+    if (destinazione && minimoPassato) router.replace(destinazione);
+  }, [destinazione, minimoPassato, router]);
 
   function chiudi() {
     try { localStorage.setItem('missio_intro', 'ok'); } catch (e) {}
@@ -213,7 +220,7 @@ export default function Intro() {
         <h1 className="display" style={{ fontSize: 40, textAlign: 'center', marginBottom: 10 }}>
           Maisola
         </h1>
-        <p style={{ textAlign: 'center', fontSize: 16, fontWeight: 600, color: 'var(--ink-soft)',
+        <p style={{ textAlign: 'center', fontSize: 16, fontWeight: 600, color: 'var(--muted)',
                     fontStyle: 'italic', margin: '0 0 36px' }}>
           Perché nessuno è un'isola.
         </p>
@@ -234,7 +241,7 @@ export default function Intro() {
           Rivedi la presentazione
         </button>
 
-        <p style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--ink-soft)', marginTop: 28 }}>
+        <p style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--muted)', marginTop: 28 }}>
           Registrandoti accetti i <a href="/termini" style={{ color: 'inherit' }}>Termini</a> e la{' '}
           <a href="/privacy" style={{ color: 'inherit' }}>Privacy</a>.
         </p>
@@ -272,7 +279,7 @@ export default function Intro() {
             <button key={k} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`}
                     style={{
                       width: k === i ? 26 : 8, height: 8, borderRadius: 4, border: 'none',
-                      background: k === i ? 'var(--void)' : 'rgba(13,10,30,.18)',
+                      background: k === i ? 'var(--ink)' : 'rgba(245,243,251,.2)',
                       transition: 'width .3s var(--spring), background .3s', padding: 0,
                     }} />
           ))}

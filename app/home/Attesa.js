@@ -70,7 +70,7 @@ export default function Attesa({ profilo, inAttesa }) {
       </div>
 
       <div className="card d2" style={{ background: 'var(--sun-soft)' }}>
-        <p className="eyebrow" style={{ color: '#9A6E00' }}>Acceleratore</p>
+        <p className="eyebrow" style={{ color: 'var(--sun-text)' }}>Acceleratore</p>
         <h2 className="display" style={{ fontSize: 20, marginTop: 8 }}>
           Dipende da te quanto ci mettiamo.
         </h2>
@@ -78,14 +78,15 @@ export default function Attesa({ profilo, inAttesa }) {
           Manda il link nel gruppo delle matricole del tuo corso. Ogni persona che entra vi
           avvicina alla prima missione.
         </p>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: '#fff',
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'var(--card-2)',
                       borderRadius: 'var(--r-md)', padding: '10px 10px 10px 14px' }}>
           <span style={{ flex: 1, fontSize: 13, color: 'var(--muted)', fontWeight: 700,
                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {link.replace('https://', '')}
           </span>
           <button onClick={copia}
-                  style={{ background: copiato ? 'var(--mint)' : 'var(--void)', color: '#fff',
+                  style={{ background: copiato ? 'var(--mint)' : 'var(--ink)',
+                           color: 'var(--void)',
                            padding: '10px 16px', borderRadius: 'var(--r-sm)', fontSize: 13,
                            fontWeight: 700, fontFamily: 'inherit', transition: 'background .3s' }}>
             {copiato ? 'Copiato' : 'Copia'}

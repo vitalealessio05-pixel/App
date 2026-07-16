@@ -104,8 +104,8 @@ export default function Profilo() {
       </div>
 
       <div className="card d2" style={{ background: 'var(--sun-soft)' }}>
-        <p className="eyebrow" style={{ color: '#9A6E00' }}>Presto</p>
-        <p className="muted" style={{ margin: '8px 0 0', lineHeight: 1.5, color: '#7A5800' }}>
+        <p className="eyebrow" style={{ color: 'var(--sun-text)' }}>Presto</p>
+        <p className="muted" style={{ margin: '8px 0 0', lineHeight: 1.5, color: 'var(--sun-text)' }}>
           I punti serviranno a sbloccare sconti nei locali vicino al campus. Intanto accumulali:
           restano tutti sul tuo profilo.
         </p>
