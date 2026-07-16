@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import Attesa from './Attesa';
 import Gruppo from './Gruppo';
+import Notifiche from '../Notifiche';
 
 export default function Home() {
   const router = useRouter();
@@ -71,6 +72,8 @@ export default function Home() {
           ? <Gruppo gruppo={gruppo} profilo={profilo} onRefresh={carica} />
           : <Attesa profilo={profilo} inAttesa={inAttesa} />}
       </div>
+
+      <Notifiche />
 
       {profilo?.is_admin && (
         <button className="btn-ghost" onClick={() => router.push('/admin')}>

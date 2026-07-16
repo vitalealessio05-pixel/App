@@ -144,8 +144,13 @@ export default function Register() {
         {stato === 'invio' ? 'Creo l’account…' : 'Crea il mio account'}
       </button>
 
+      <p style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--muted)', marginTop: 14 }}>
+        Creando l'account accetti i <a href="/termini" style={{ color: 'inherit' }}>Termini</a> e la{' '}
+        <a href="/privacy" style={{ color: 'inherit' }}>Privacy</a>.
+      </p>
+
       <button type="button" className="btn-text"
-              style={{ display: 'block', margin: '20px auto 0' }}
+              style={{ display: 'block', margin: '8px auto 0' }}
               onClick={() => router.push('/login')}>
         Hai già un account? Accedi
       </button>

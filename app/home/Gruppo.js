@@ -20,7 +20,8 @@ function rimasto(scadenza) {
 
 export default function Gruppo({ gruppo, profilo, onRefresh }) {
   const [membri, setMembri] = useState([]);
-  const [missione, setMaisolane] = useState(null);
+  const [missione, setMissione] = useState(null);
+  const [motivoRifiuto, setMotivoRifiuto] = useState(null);
   const [punti, setPunti] = useState(0);
   const [storico, setStorico] = useState([]);
   const [caricando, setCaricando] = useState(true);
@@ -32,7 +33,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
 
     const { data: m } = await sb
       .from('group_members')
-      .select('user_id, profiles(id, nome)')
+      .select('user_id, profiles(id, nome, citta_provenienza)')
       .eq('group_id', gruppo.id);
     setMembri((m || []).map((x) => x.profiles).filter(Boolean));
 
@@ -43,7 +44,21 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
       .in('stato', ['attiva', 'in_verifica'])
       .order('assegnata_il', { ascending: false })
       .limit(1);
-    setMaisolane(gm && gm[0] ? gm[0] : null);
+    const missioneAttuale = gm && gm[0] ? gm[0] : null;
+    setMissione(missioneAttuale);
+
+    if (missioneAttuale && missioneAttuale.stato === 'attiva') {
+      const { data: rifiutate } = await sb
+        .from('submissions')
+        .select('nota_admin, created_at')
+        .eq('group_mission_id', missioneAttuale.id)
+        .eq('stato', 'rifiutata')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      setMotivoRifiuto(rifiutate && rifiutate[0] ? rifiutate[0].nota_admin : null);
+    } else {
+      setMotivoRifiuto(null);
+    }
 
     const { data: pl } = await sb
       .from('points_ledger')
@@ -78,7 +93,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
           ))}
         </div>
         <p style={{ margin: 0, fontSize: 15, fontWeight: 700, lineHeight: 1.5 }}>
-          {membri.map((m) => m.nome).join(' · ')}
+          {membri.map((m) => m.citta_provenienza ? `${m.nome} (${m.citta_provenienza})` : m.nome).join(' · ')}
         </p>
 
         {gruppo.chat_link && (
@@ -106,7 +121,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
       </div>
 
       {missione ? (
-        <Maisolane gm={missione} membri={membri} profilo={profilo}
+        <Missione gm={missione} membri={membri} profilo={profilo} motivoRifiuto={motivoRifiuto}
                   onDone={() => { carica(); onRefresh(); }} />
       ) : (
         <div className="card d3">
@@ -120,7 +135,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
   );
 }
 
-function Maisolane({ gm, membri, profilo, onDone }) {
+function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
   const [file, setFile] = useState(null);
   const [anteprima, setAnteprima] = useState(null);
   const [presenti, setPresenti] = useState([profilo.id]);
@@ -206,9 +221,21 @@ function Maisolane({ gm, membri, profilo, onDone }) {
   }
 
   return (
+    <>
+      {motivoRifiuto && (
+        <div className="card d3" style={{ background: 'var(--stamp-soft, #F1DAD3)' }}>
+          <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 800, textTransform: 'uppercase',
+                     letterSpacing: '.05em', color: 'var(--coral)' }}>
+            La foto di prima non è passata
+          </p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--ink, #1B2A4A)' }}>
+            {motivoRifiuto}
+          </p>
+        </div>
+      )}
     <div className="card d3" style={{ background: 'var(--coral)', color: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.7)' }}>Maisolane della settimana</p>
+        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.7)' }}>Missione della settimana</p>
         <span style={{ background: 'rgba(255,255,255,.2)', padding: '5px 11px',
                        borderRadius: 'var(--r-full)', fontSize: 12, fontWeight: 800 }}>
           {r}
@@ -266,5 +293,6 @@ function Maisolane({ gm, membri, profilo, onDone }) {
         {invio ? 'Carico…' : 'Consegna la prova'}
       </button>
     </div>
+    </>
   );
 }

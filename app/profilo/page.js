@@ -15,7 +15,7 @@ export default function Profilo() {
   const [profilo, setProfilo] = useState(null);
   const [gruppi, setGruppi] = useState([]);
   const [puntiMiei, setPuntiMiei] = useState(0);
-  const [missioniFatte, setMaisolaniFatte] = useState([]);
+  const [missioniFatte, setMissioniFatte] = useState([]);
   const [caricando, setCaricando] = useState(true);
 
   const carica = useCallback(async () => {
@@ -45,7 +45,7 @@ export default function Profilo() {
         .map((x) => x.submissions)
         .filter((s) => s && s.stato === 'approvata');
 
-      setMaisolaniFatte(approvate);
+      setMissioniFatte(approvate);
       setPuntiMiei(
         approvate.reduce((tot, s) => tot + (s.group_missions?.missions?.punti || 0), 0)
       );
@@ -153,7 +153,7 @@ export default function Profilo() {
       {missioniFatte.length > 0 && (
         <>
           <h2 className="display" style={{ fontSize: 20, marginTop: 32, marginBottom: 12 }}>
-            Maisolani completate
+            Missioni completate
           </h2>
           <div className="card d3">
             {missioniFatte.map((s, i) => (

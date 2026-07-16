@@ -12,9 +12,10 @@ const ATENEI = {
     corsi: ['Ingegneria Informatica', 'Ingegneria Gestionale', 'Comunicazione', 'Giurisprudenza',
             'Economia', 'Psicologia', 'Lettere', 'Medicina', 'Architettura'],
   },
-  'Università della Tuscia': {
-    campus: ['Riello', 'Santa Maria in Gradi', 'San Carlo'],
-    corsi: ['Scienze Agrarie', 'Economia Aziendale', 'Beni Culturali', 'Scienze Biologiche', 'Informatica'],
+  'Università di Perugia': {
+    campus: ['Centro storico', 'Monteluce', 'Ponte San Giovanni'],
+    corsi: ['Economia', 'Giurisprudenza', 'Ingegneria', 'Medicina', 'Medicina Veterinaria',
+            'Scienze Politiche', 'Lettere e Filosofia', 'Scienze MFN', 'Agraria', 'Farmacia'],
   },
 };
 
@@ -35,6 +36,7 @@ export default function Onboarding() {
   const [anno, setAnno] = useState(1);
   const [dispo, setDispo] = useState('');
   const [conosce, setConosce] = useState('');
+  const [citta, setCitta] = useState('');
   const [salvo, setSalvo] = useState(false);
   const [err, setErr] = useState('');
 
@@ -91,6 +93,7 @@ export default function Onboarding() {
           anno: Number(anno),
           disponibilita: dispo,
           conosce_nome: pulisci(conosce) || null,
+          citta_provenienza: pulisci(citta) || null,
         },
         { onConflict: 'id' }
       );
@@ -169,6 +172,13 @@ export default function Onboarding() {
           <option value={3}>Terzo anno</option>
           <option value={4}>Fuori corso o magistrale</option>
         </select>
+
+        <label htmlFor="citta">Da dove vieni? <span style={{ textTransform: 'none', fontWeight: 400 }}>(facoltativo)</span></label>
+        <input id="citta" value={citta} onChange={(e) => setCitta(e.target.value)}
+               placeholder="Es. Bari" />
+        <p className="hint">
+          Compare accanto al tuo nome nel gruppo — a volte basta per rompere il ghiaccio.
+        </p>
       </div>
 
       <div className="card d2">

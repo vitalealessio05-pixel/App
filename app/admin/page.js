@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import { notificaGruppo } from '../../lib/notifiche';
 
 export default function Admin() {
   const router = useRouter();
   const [ok, setOk] = useState(false);
   const [attesa, setAttesa] = useState([]);
   const [gruppi, setGruppi] = useState([]);
-  const [missioni, setMaisolani] = useState([]);
+  const [missioni, setMissioni] = useState([]);
   const [daVerificare, setDaVerificare] = useState([]);
   const [sel, setSel] = useState([]);
   const [msg, setMsg] = useState('');
@@ -41,7 +42,7 @@ export default function Admin() {
     setGruppi(g || []);
 
     const { data: ms } = await sb.from('missions').select('*').eq('attiva', true);
-    setMaisolani(ms || []);
+    setMissioni(ms || []);
 
     const { data: subs } = await sb
       .from('submissions')
@@ -99,7 +100,14 @@ export default function Admin() {
     const sb = supabase();
     const scadenza = new Date(Date.now() + 4 * 86400000).toISOString();
     const { error } = await sb.from('group_missions').insert({ group_id: groupId, mission_id: missionId, scadenza });
-    setMsg(error ? 'Assegnazione fallita: ' + error.message : 'Maisolane assegnata.');
+    setMsg(error ? 'Assegnazione fallita: ' + error.message : 'Missione assegnata.');
+    if (!error) {
+      const missione = missioni.find((m) => m.id === missionId);
+      notificaGruppo(groupId, {
+        title: 'Nuova missione!',
+        body: missione ? missione.titolo : 'Il tuo gruppo ha una nuova missione.',
+      });
+    }
     carica();
   }
 
@@ -123,14 +131,28 @@ export default function Admin() {
       motivo: sub.group_missions.missions.titolo,
     });
     setMsg('Approvata, punti assegnati.');
+    notificaGruppo(sub.group_missions.group_id, {
+      title: 'Missione approvata!',
+      body: `+${sub.group_missions.missions.punti} punti per "${sub.group_missions.missions.titolo}"`,
+      url: '/profilo',
+    });
     carica();
   }
 
   async function rifiuta(sub) {
+    const motivo = window.prompt(
+      'Perché la rifiuti? Il gruppo vedrà questo messaggio (es. "la foto non mostra il posto giusto").'
+    );
+    if (motivo === null) return; // hanno annullato
+
     const sb = supabase();
-    await sb.from('submissions').update({ stato: 'rifiutata' }).eq('id', sub.id);
+    await sb.from('submissions').update({ stato: 'rifiutata', nota_admin: motivo || null }).eq('id', sub.id);
     await sb.from('group_missions').update({ stato: 'attiva' }).eq('id', sub.group_missions.id);
     setMsg('Rifiutata, la missione torna attiva.');
+    notificaGruppo(sub.group_missions.group_id, {
+      title: 'La prova non è passata',
+      body: motivo || 'Ricontrollate la missione e riprovate.',
+    });
     carica();
   }
 

@@ -183,13 +183,26 @@ export default function Intro() {
 
   if (finito) {
     return (
-      <div>
-        <div className="brand"><span className="brand-dot" />Maisola</div>
+      <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
-        <h1 className="display" style={{ marginTop: 40 }}>
-          La città<br />inizia qui.
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
+          <div style={{ position: 'relative', width: 76, height: 56 }}>
+            <div style={{ position: 'absolute', left: 0, top: 4, width: 48, height: 48,
+                          borderRadius: '50%', background: 'var(--coral)' }} />
+            <div style={{ position: 'absolute', left: 28, top: 4, width: 48, height: 48,
+                          borderRadius: '50%', background: 'var(--iris)', opacity: 0.88 }} />
+          </div>
+        </div>
+
+        <h1 className="display" style={{ fontSize: 40, textAlign: 'center', marginBottom: 10 }}>
+          Maisola
         </h1>
-        <p className="sub">
+        <p style={{ textAlign: 'center', fontSize: 16, fontWeight: 600, color: 'var(--ink-soft)',
+                    fontStyle: 'italic', margin: '0 0 36px' }}>
+          Perché nessuno è un'isola.
+        </p>
+
+        <p className="sub" style={{ textAlign: 'center', marginBottom: 28 }}>
           Un gruppo del tuo corso. Una missione a settimana. Nessuno deve fare il primo passo da solo.
         </p>
 
@@ -204,6 +217,11 @@ export default function Intro() {
                 onClick={() => { setFinito(false); setI(0); }}>
           Rivedi la presentazione
         </button>
+
+        <p style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--ink-soft)', marginTop: 28 }}>
+          Registrandoti accetti i <a href="/termini" style={{ color: 'inherit' }}>Termini</a> e la{' '}
+          <a href="/privacy" style={{ color: 'inherit' }}>Privacy</a>.
+        </p>
       </div>
     );
   }
