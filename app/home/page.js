@@ -7,6 +7,7 @@ import Attesa from './Attesa';
 import Gruppo from './Gruppo';
 import Notifiche from '../Notifiche';
 import BrandMark from '../BrandMark';
+import InstallaApp from '../InstallaApp';
 
 export default function Home() {
   const router = useRouter();
@@ -69,6 +70,7 @@ export default function Home() {
         <button className="btn-text" onClick={() => router.push('/profilo')}>Profilo</button>
       </div>
 
+      <InstallaApp />
       <Notifiche urgente={!gruppo} />
 
       <div style={{ marginTop: 16 }}>

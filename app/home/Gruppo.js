@@ -97,12 +97,18 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
         </p>
 
         {gruppo.chat_link && (
-          <a href={gruppo.chat_link} target="_blank" rel="noreferrer"
-             style={{ display: 'block', marginTop: 18, textAlign: 'center', padding: 15,
-                      background: 'var(--iris-soft)', borderRadius: 'var(--r-md)',
-                      color: 'var(--iris)', textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
-            Apri la chat del gruppo →
-          </a>
+          <>
+            <a href={gruppo.chat_link} target="_blank" rel="noreferrer"
+               style={{ display: 'block', marginTop: 18, textAlign: 'center', padding: 15,
+                        background: 'var(--iris-soft)', borderRadius: 'var(--r-md)',
+                        color: 'var(--iris)', textDecoration: 'none', fontWeight: 800, fontSize: 15 }}>
+              Apri la chat del gruppo →
+            </a>
+            <p className="hint" style={{ textAlign: 'center', marginTop: 8 }}>
+              Si apre su Telegram. Non ce l'hai? Si scarica gratis in 30 secondi,
+              te lo chiede lui stesso al primo tap.
+            </p>
+          </>
         )}
       </div>
 
