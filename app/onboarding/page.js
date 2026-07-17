@@ -38,6 +38,7 @@ export default function Onboarding() {
   const [dispo, setDispo] = useState('');
   const [conosce, setConosce] = useState('');
   const [citta, setCitta] = useState('');
+  const [curiosita, setCuriosita] = useState('');
   const [salvo, setSalvo] = useState(false);
   const [err, setErr] = useState('');
 
@@ -95,6 +96,7 @@ export default function Onboarding() {
           disponibilita: dispo,
           conosce_nome: pulisci(conosce) || null,
           citta_provenienza: pulisci(citta) || null,
+          curiosita: pulisci(curiosita) || null,
         },
         { onConflict: 'id' }
       );
@@ -179,6 +181,13 @@ export default function Onboarding() {
                placeholder="Es. Bari" />
         <p className="hint">
           Compare accanto al tuo nome nel gruppo — a volte basta per rompere il ghiaccio.
+        </p>
+
+        <label htmlFor="curiosita">Una cosa buffa o interessante su di te <span style={{ textTransform: 'none', fontWeight: 400 }}>(facoltativo)</span></label>
+        <input id="curiosita" value={curiosita} onChange={(e) => setCuriosita(e.target.value)}
+               placeholder="Es. Ho un cane che si chiama Espresso" maxLength={80} />
+        <p className="hint">
+          Il tuo gruppo la vede appena si forma — è il primo appiglio per rompere il ghiaccio prima ancora di scriversi.
         </p>
       </div>
 

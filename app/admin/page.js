@@ -26,7 +26,7 @@ export default function Admin() {
 
     const { data: tutti } = await sb
       .from('profiles')
-      .select('id, nome, ateneo, campus, corso, anno, disponibilita, conosce_nome, citta_provenienza, segment_key, created_at')
+      .select('id, nome, ateneo, campus, corso, anno, disponibilita, conosce_nome, citta_provenienza, curiosita, segment_key, created_at')
       .eq('is_admin', false)
       .order('created_at');
 
@@ -260,14 +260,21 @@ export default function Admin() {
                     {persone[0].corso} · {persone[0].campus} — {persone.length}
                   </p>
                   {persone.map((p) => (
-                    <label key={p.id} className={sel.includes(p.id) ? 'adm-row sel' : 'adm-row'}>
-                      <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggleSel(p.id)} />
+                    <label key={p.id} className={sel.includes(p.id) ? 'adm-row sel' : 'adm-row'}
+                           style={{ alignItems: 'flex-start' }}>
+                      <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggleSel(p.id)}
+                             style={{ marginTop: 3 }} />
                       <span style={{ flex: 1 }}>
                         <b>{p.nome}</b>
                         {p.citta_provenienza && <span className="adm-row-meta"> ({p.citta_provenienza})</span>}
                         <span className="adm-row-meta"> · {p.disponibilita} · {p.anno}° anno</span>
                         {p.conosce_nome && (
                           <span className="adm-flag"> — conosce: {p.conosce_nome}</span>
+                        )}
+                        {p.curiosita && (
+                          <div style={{ fontSize: 12, color: 'var(--a-accent)', marginTop: 2, fontStyle: 'italic' }}>
+                            "{p.curiosita}"
+                          </div>
                         )}
                       </span>
                     </label>
