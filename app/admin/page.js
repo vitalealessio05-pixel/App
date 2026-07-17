@@ -11,6 +11,7 @@ export default function Admin() {
   const [attesa, setAttesa] = useState([]);
   const [gruppi, setGruppi] = useState([]);
   const [missioni, setMissioni] = useState([]);
+  const [poolTelegram, setPoolTelegram] = useState([]);
   const [daVerificare, setDaVerificare] = useState([]);
   const [sel, setSel] = useState([]);
   const [msg, setMsg] = useState('');
@@ -36,14 +37,25 @@ export default function Admin() {
     );
     setAttesa((tutti || []).filter((p) => !occupati.has(p.id)));
 
-    const { data: g } = await sb
+    const { data: g, error: erroreGruppi } = await sb
       .from('groups')
       .select('id, nome, segment_key, stato, chat_link, telegram_chat_id, group_members(user_id, profiles(nome, curiosita)), group_missions(mission_id)')
       .eq('stato', 'attivo');
+    if (erroreGruppi) {
+      console.error('caricamento gruppi:', erroreGruppi);
+      setMsg('Errore nel caricare i gruppi: ' + erroreGruppi.message);
+    }
     setGruppi(g || []);
 
     const { data: ms } = await sb.from('missions').select('*').eq('attiva', true);
     setMissioni(ms || []);
+
+    const { data: pool } = await sb
+      .from('telegram_pool')
+      .select('id, titolo, invite_link')
+      .is('assegnato_a_group_id', null)
+      .order('creato_il');
+    setPoolTelegram(pool || []);
 
     const { data: subs } = await sb
       .from('submissions')
@@ -135,6 +147,18 @@ export default function Admin() {
   async function salvaChatId(groupId, telegramChatId) {
     await supabase().from('groups').update({ telegram_chat_id: telegramChatId || null }).eq('id', groupId);
     setMsg('Chat ID salvato.');
+    carica();
+  }
+
+  async function assegnaDalMagazzino(groupId, poolId) {
+    if (!poolId) return;
+    const { data, error } = await supabase().rpc('assegna_gruppo_telegram', {
+      p_pool_id: poolId,
+      p_group_id: groupId,
+    });
+    if (error) { setMsg('Assegnazione fallita: ' + error.message); return; }
+    if (!data?.ok) { setMsg('Assegnazione fallita: ' + data?.motivo); return; }
+    setMsg('Gruppo Telegram collegato dal magazzino.');
     carica();
   }
 
@@ -390,18 +414,38 @@ export default function Admin() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12,
-                                alignItems: 'end', marginTop: 12 }}>
-                    <div>
-                      <label className="adm-field-label">Telegram Chat ID</label>
-                      <input className="adm-input" defaultValue={g.telegram_chat_id || ''}
-                             placeholder="Scrivi /id nel gruppo per averlo"
-                             onBlur={(e) => e.target.value !== (g.telegram_chat_id || '') && salvaChatId(g.id, e.target.value)} />
+                  {!g.telegram_chat_id ? (
+                    <div style={{ marginTop: 12 }}>
+                      <label className="adm-field-label">Collega un gruppo Telegram</label>
+                      {poolTelegram.length > 0 ? (
+                        <select className="adm-select" defaultValue=""
+                                onChange={(e) => e.target.value && assegnaDalMagazzino(g.id, e.target.value)}>
+                          <option value="">Scegli dal magazzino…</option>
+                          {poolTelegram.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.titolo}{p.invite_link ? '' : ' (nessun link — rendi il bot admin)'}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p className="adm-empty" style={{ padding: 0 }}>
+                          Magazzino vuoto: aggiungi il bot a un gruppo Telegram, si registra da solo.
+                        </p>
+                      )}
+                      <p className="adm-card-sub" style={{ marginTop: 8, marginBottom: 0 }}>
+                        Oppure incolla un Chat ID a mano:{' '}
+                        <input className="adm-input" style={{ marginTop: 6 }}
+                               placeholder="es. -1001234567890"
+                               onBlur={(e) => e.target.value && salvaChatId(g.id, e.target.value)} />
+                      </p>
                     </div>
-                    <button className="adm-btn adm-btn-accent" onClick={() => mandaBenvenuto(g)}>
-                      Manda benvenuto
-                    </button>
-                  </div>
+                  ) : (
+                    <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+                      <button className="adm-btn adm-btn-accent" onClick={() => mandaBenvenuto(g)}>
+                        Manda benvenuto
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
