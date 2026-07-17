@@ -218,7 +218,7 @@ export default function Intro() {
         </h1>
         <p style={{ textAlign: 'center', fontSize: 16, fontWeight: 600, color: 'var(--muted)',
                     fontStyle: 'italic', margin: '0 0 36px' }}>
-          Perché nessuno è un'isola.
+          Fuorisede, mai soli.
         </p>
 
         <p className="sub" style={{ textAlign: 'center', marginBottom: 28 }}>

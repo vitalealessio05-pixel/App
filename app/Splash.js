@@ -48,7 +48,7 @@ export default function Splash({ uscendo }) {
         fontSize: 14, fontWeight: 600, fontStyle: 'italic',
         color: 'rgba(255,255,255,.65)', margin: '8px 0 0',
       }}>
-        Perché nessuno è un'isola.
+        Fuorisede, mai soli.
       </p>
     </div>
   );

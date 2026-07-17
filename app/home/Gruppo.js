@@ -109,7 +109,7 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
       <div className="card card-iris d2" style={{ display: 'flex', alignItems: 'center',
                                                    justifyContent: 'space-between' }}>
         <div>
-          <p className="eyebrow" style={{ color: 'rgba(255,255,255,.6)' }}>Punti del gruppo</p>
+          <p className="eyebrow" style={{ color: 'rgba(255,255,255,.78)' }}>Punti del gruppo</p>
           <div className="display" style={{ fontSize: 42, marginTop: 6 }}>{punti}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -244,7 +244,7 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
   if (gm.missions.virtuale) {
     return (
       <div className="card d3" style={{ background: 'var(--iris)', color: '#fff' }}>
-        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.7)' }}>Missione veloce</p>
+        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.85)' }}>Missione veloce</p>
         <h2 className="display" style={{ fontSize: 24, marginTop: 10 }}>{gm.missions.titolo}</h2>
         <p style={{ fontSize: 15, lineHeight: 1.55, opacity: .88, marginTop: 10 }}>
           {gm.missions.descrizione}
@@ -260,7 +260,7 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
                          boxShadow: '0 6px 0 -1px rgba(0,0,0,.18)' }}>
           {invioVirtuale ? 'Un attimo…' : 'Fatto!'}
         </button>
-        <p className="hint" style={{ color: 'rgba(255,255,255,.6)', textAlign: 'center', marginTop: 10 }}>
+        <p className="hint" style={{ color: 'rgba(255,255,255,.78)', textAlign: 'center', marginTop: 10 }}>
           Basta un tap di uno del gruppo, niente foto.
         </p>
       </div>
@@ -282,7 +282,7 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
       )}
     <div className="card d3" style={{ background: 'var(--coral)', color: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.7)' }}>Missione della settimana</p>
+        <p className="eyebrow" style={{ color: 'rgba(255,255,255,.85)' }}>Missione della settimana</p>
         <span style={{ background: 'rgba(255,255,255,.2)', padding: '5px 11px',
                        borderRadius: 'var(--r-full)', fontSize: 12, fontWeight: 800 }}>
           {r}
@@ -299,7 +299,7 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
 
       <div style={{ background: 'rgba(255,255,255,.14)', borderRadius: 'var(--r-md)',
                     padding: 18, marginTop: 20 }}>
-        <label style={{ color: 'rgba(255,255,255,.75)', margin: '0 0 10px' }}>La prova</label>
+        <label style={{ color: 'rgba(255,255,255,.88)', margin: '0 0 10px' }}>La prova</label>
 
         <label htmlFor="foto" style={{
           display: 'block', textAlign: 'center', padding: anteprima ? 0 : '26px 16px',
@@ -315,7 +315,7 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
         <input id="foto" type="file" accept="image/*" capture="environment"
                onChange={scegli} style={{ display: 'none' }} />
 
-        <label style={{ color: 'rgba(255,255,255,.75)', marginTop: 20 }}>Chi c’era?</label>
+        <label style={{ color: 'rgba(255,255,255,.88)', marginTop: 20 }}>Chi c’era?</label>
         <div className="chip-row">
           {membri.map((m) => (
             <button type="button" key={m.id} onClick={() => toggle(m.id)}
