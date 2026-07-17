@@ -5,6 +5,24 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import { notificaGruppo } from '../../lib/notifiche';
 
+// mappa ateneo → città: serve per non proporre mai una missione legata a
+// un posto specifico (es. il Pincio) a un gruppo di un'altra città.
+// Se un ateneo non è mappato, le missioni legate a una città vengono
+// nascoste per prudenza — meglio mostrarne di meno che sbagliare posto.
+const ATENEO_CITTA = {
+  'sapienza università di roma': 'Roma',
+  'università di perugia': 'Perugia',
+};
+
+function cittaDelSegmento(segmentKey) {
+  const ateneo = (segmentKey || '').split('|')[0] || '';
+  return ATENEO_CITTA[ateneo] || null;
+}
+
+function missioniValidePerCitta(missioni, citta) {
+  return missioni.filter((m) => !m.citta || (citta && m.citta.toLowerCase() === citta.toLowerCase()));
+}
+
 export default function Admin() {
   const router = useRouter();
   const [ok, setOk] = useState(false);
@@ -215,7 +233,9 @@ export default function Admin() {
       .select('mission_id')
       .eq('group_id', groupId);
     const usate = new Set((usateRows || []).map((r) => r.mission_id));
-    const disponibili = missioni.filter((m) => !usate.has(m.id));
+    const gruppoCorrente = gruppi.find((gr) => gr.id === groupId);
+    const cittaGruppo = cittaDelSegmento(gruppoCorrente?.segment_key);
+    const disponibili = missioniValidePerCitta(missioni.filter((m) => !usate.has(m.id)), cittaGruppo);
 
     let msgFinale = 'Approvata, punti assegnati. Notifiche: ' + notificaA.motivo;
 
@@ -395,7 +415,11 @@ export default function Admin() {
                       <label className="adm-field-label">Assegna missione</label>
                       {(() => {
                         const giaUsate = new Set((g.group_missions || []).map((gm) => gm.mission_id));
-                        const disponibili = missioni.filter((m) => !giaUsate.has(m.id));
+                        const cittaGruppo = cittaDelSegmento(g.segment_key);
+                        const disponibili = missioniValidePerCitta(
+                          missioni.filter((m) => !giaUsate.has(m.id)),
+                          cittaGruppo
+                        );
                         if (disponibili.length === 0) {
                           return <p className="adm-empty" style={{ padding: 0 }}>Nessuna missione nuova disponibile.</p>;
                         }

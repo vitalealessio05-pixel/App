@@ -44,7 +44,7 @@ create index if not exists group_members_user_idx on group_members(user_id);
 -- ---------- MISSIONI ----------
 create table if not exists missions (
   id uuid primary key default gen_random_uuid(),
-  titolo text not null,
+  titolo text not null unique,
   descrizione text not null,
   citta text,
   punti int not null default 100,
@@ -279,4 +279,4 @@ insert into missions (titolo, descrizione, citta, punti) values
   ('Colazione da matricole', 'Trovate il bar più vicino al campus con il cornetto migliore. Foto del tavolo con tutti i cornetti.', 'Roma', 100),
   ('La panchina con vista', 'Trovate un punto panoramico gratuito della città e fate una foto di gruppo con il panorama alle spalle.', 'Roma', 120),
   ('Il libro dimenticato', 'Andate insieme in una biblioteca del campus e trovate il libro più vecchio che riuscite. Foto con il libro.', 'Roma', 100)
-on conflict do nothing;
+on conflict (titolo) do nothing;

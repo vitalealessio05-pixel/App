@@ -60,4 +60,4 @@ insert into missions (titolo, descrizione, punti, virtuale) values
   ('Presentatevi in chat', 'Ognuno scrive nel gruppo una cosa a caso di se: una canzone, un piatto, una serie TV. Niente di serio, solo per rompere il ghiaccio prima di vedervi davvero.', 15, true),
   ('Il sondaggio del gruppo', 'In chat, decidete insieme: mare o montagna? Basta rispondere.', 10, true),
   ('Scegliete un nome al gruppo', 'Proponete e scegliete un soprannome per il vostro gruppo, da usare da qui in poi.', 10, true)
-on conflict do nothing;
+on conflict (titolo) do nothing;
