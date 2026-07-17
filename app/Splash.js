@@ -27,10 +27,10 @@ export default function Splash({ uscendo }) {
       `}</style>
 
       <img
-        src="/splash-mark.jpg"
+        src="/splash-mark.png"
         alt=""
         className="splash-img"
-        style={{ width: 148, height: 148, borderRadius: '50%', marginBottom: 22, objectFit: 'cover' }}
+        style={{ width: 168, height: 168, marginBottom: 22, objectFit: 'contain' }}
       />
 
       <h1 className="splash-name display" style={{ fontSize: 32, color: '#fff', margin: 0 }}>
