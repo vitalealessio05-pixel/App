@@ -25,20 +25,13 @@ export default function Splash({ uscendo }) {
       `}</style>
 
       <svg width="88" height="88" viewBox="0 0 100 100" style={{ marginBottom: 22 }}>
-        <g transform="translate(50,50)" fill="none" strokeLinecap="round">
-          <path className="splash-arc" style={{ animationDelay: '.18s' }}
-                d="M -6,-10 A 10,10 0 0 0 -6,10" strokeWidth="9" stroke="var(--coral)" />
-          <path className="splash-arc" style={{ animationDelay: '.30s' }}
-                d="M -6,-21 A 21,21 0 0 0 -6,21" strokeWidth="9" stroke="var(--coral)" />
-          <path className="splash-arc" style={{ animationDelay: '.42s' }}
-                d="M -6,-32 A 32,32 0 0 0 -6,32" strokeWidth="9" stroke="var(--coral)" />
-          <path className="splash-arc" style={{ animationDelay: '.18s' }}
-                d="M 6,-10 A 10,10 0 0 1 6,10" strokeWidth="9" stroke="var(--iris)" />
-          <path className="splash-arc" style={{ animationDelay: '.30s' }}
-                d="M 6,-21 A 21,21 0 0 1 6,21" strokeWidth="9" stroke="var(--iris)" />
-          <path className="splash-arc" style={{ animationDelay: '.42s' }}
-                d="M 6,-32 A 32,32 0 0 1 6,32" strokeWidth="9" stroke="var(--iris)" />
+        <g stroke="var(--coral)" strokeWidth="8" strokeLinecap="round">
+          <line className="splash-arc" style={{ animationDelay: '.18s' }} x1="32" y1="70" x2="32" y2="48" />
+          <line className="splash-arc" style={{ animationDelay: '.30s' }} x1="50" y1="70" x2="50" y2="34" />
+          <line className="splash-arc" style={{ animationDelay: '.42s' }} x1="68" y1="70" x2="68" y2="48" />
         </g>
+        <path className="splash-arc" style={{ animationDelay: '.52s' }}
+              d="M 24 72 Q 50 82 76 72" stroke="var(--coral)" strokeWidth="8" fill="none" strokeLinecap="round" />
       </svg>
 
       <h1 className="splash-name display" style={{ fontSize: 32, color: '#fff', margin: 0 }}>
