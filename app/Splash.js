@@ -11,28 +11,27 @@ export default function Splash({ uscendo }) {
       pointerEvents: uscendo ? 'none' : 'auto',
     }}>
       <style>{`
-        @keyframes arcIn {
-          from { opacity: 0; transform: scale(0.5); }
+        @keyframes splashImgIn {
+          from { opacity: 0; transform: scale(0.88); }
           to { opacity: 1; transform: scale(1); }
         }
         @keyframes splashSlide {
           from { transform: translateY(10px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
-        .splash-arc { transform-origin: center; animation: arcIn .4s cubic-bezier(0.22,1,0.36,1) both; }
-        .splash-name { animation: splashSlide .5s ease .5s both; }
-        .splash-motto { animation: splashSlide .5s ease .65s both; }
+        .splash-img {
+          animation: splashImgIn .6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .splash-name { animation: splashSlide .5s ease .35s both; }
+        .splash-motto { animation: splashSlide .5s ease .5s both; }
       `}</style>
 
-      <svg width="88" height="88" viewBox="0 0 100 100" style={{ marginBottom: 22 }}>
-        <g stroke="var(--coral)" strokeWidth="8" strokeLinecap="round">
-          <line className="splash-arc" style={{ animationDelay: '.18s' }} x1="32" y1="70" x2="32" y2="48" />
-          <line className="splash-arc" style={{ animationDelay: '.30s' }} x1="50" y1="70" x2="50" y2="34" />
-          <line className="splash-arc" style={{ animationDelay: '.42s' }} x1="68" y1="70" x2="68" y2="48" />
-        </g>
-        <path className="splash-arc" style={{ animationDelay: '.52s' }}
-              d="M 24 72 Q 50 82 76 72" stroke="var(--coral)" strokeWidth="8" fill="none" strokeLinecap="round" />
-      </svg>
+      <img
+        src="/splash-mark.jpg"
+        alt=""
+        className="splash-img"
+        style={{ width: 148, height: 148, borderRadius: '50%', marginBottom: 22, objectFit: 'cover' }}
+      />
 
       <h1 className="splash-name display" style={{ fontSize: 32, color: '#fff', margin: 0 }}>
         Maisola
