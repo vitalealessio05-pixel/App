@@ -202,7 +202,10 @@ function Missione({ gm, membri, profilo, motivoRifiuto, onDone }) {
         .insert(presenti.map((uid) => ({ submission_id: sub.id, user_id: uid })));
       if (presErr) throw presErr;
 
-      await sb.from('group_missions').update({ stato: 'in_verifica' }).eq('id', gm.id);
+      const { data: risultato, error: rpcErr } = await sb.rpc('segna_in_verifica', { gm_id: gm.id });
+      if (rpcErr) throw rpcErr;
+      if (!risultato?.ok) throw new Error(risultato?.motivo || 'aggiornamento fallito');
+
       onDone();
     } catch (e) {
       console.error(e);
