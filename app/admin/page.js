@@ -38,7 +38,7 @@ export default function Admin() {
 
     const { data: g } = await sb
       .from('groups')
-      .select('id, nome, segment_key, stato, chat_link, group_members(user_id, profiles(nome)), group_missions(mission_id)')
+      .select('id, nome, segment_key, stato, chat_link, telegram_chat_id, group_members(user_id, profiles(nome, curiosita)), group_missions(mission_id)')
       .eq('stato', 'attivo');
     setGruppi(g || []);
 
@@ -130,6 +130,37 @@ export default function Admin() {
     await supabase().from('groups').update({ chat_link: link }).eq('id', groupId);
     setMsg('Link chat salvato.');
     carica();
+  }
+
+  async function salvaChatId(groupId, telegramChatId) {
+    await supabase().from('groups').update({ telegram_chat_id: telegramChatId || null }).eq('id', groupId);
+    setMsg('Chat ID salvato.');
+    carica();
+  }
+
+  async function mandaBenvenuto(gruppo) {
+    if (!gruppo.telegram_chat_id) {
+      setMsg('Manca il Chat ID di questo gruppo: scrivi /id nel gruppo Telegram e incollalo qui sotto.');
+      return;
+    }
+
+    const membri = (gruppo.group_members || []).map((m) => m.profiles).filter(Boolean);
+    const righe = membri.map((m) =>
+      m.curiosita ? `• <b>${m.nome}</b> — ${m.curiosita}` : `• <b>${m.nome}</b>`
+    );
+
+    const testo =
+      `Ciao! Siete voi ${membri.length}:\n\n${righe.join('\n')}\n\n` +
+      `Presto arriva la prima missione. Nel frattempo, rompete il ghiaccio 👋`;
+
+    setMsg('Invio in corso…');
+    const res = await fetch('/api/telegram-invia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatId: gruppo.telegram_chat_id, testo }),
+    });
+    const json = await res.json();
+    setMsg(json.ok ? 'Messaggio di benvenuto inviato.' : 'Invio fallito: ' + json.motivo);
   }
 
   async function approva(sub) {
@@ -357,6 +388,19 @@ export default function Admin() {
                         );
                       })()}
                     </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12,
+                                alignItems: 'end', marginTop: 12 }}>
+                    <div>
+                      <label className="adm-field-label">Telegram Chat ID</label>
+                      <input className="adm-input" defaultValue={g.telegram_chat_id || ''}
+                             placeholder="Scrivi /id nel gruppo per averlo"
+                             onBlur={(e) => e.target.value !== (g.telegram_chat_id || '') && salvaChatId(g.id, e.target.value)} />
+                    </div>
+                    <button className="adm-btn adm-btn-accent" onClick={() => mandaBenvenuto(g)}>
+                      Manda benvenuto
+                    </button>
                   </div>
                 </div>
               ))}
