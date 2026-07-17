@@ -69,13 +69,13 @@ export default function Home() {
         <button className="btn-text" onClick={() => router.push('/profilo')}>Profilo</button>
       </div>
 
-      <div style={{ marginTop: 28 }}>
+      <Notifiche urgente={!gruppo} />
+
+      <div style={{ marginTop: 16 }}>
         {gruppo
           ? <Gruppo gruppo={gruppo} profilo={profilo} onRefresh={carica} />
           : <Attesa profilo={profilo} inAttesa={inAttesa} />}
       </div>
-
-      <Notifiche />
     </div>
   );
 }

@@ -20,7 +20,7 @@ function isStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
 
-export default function Notifiche() {
+export default function Notifiche({ urgente = false }) {
   const [supportato, setSupportato] = useState(true);
   const [stato, setStato] = useState('controllo'); // controllo | ios-non-installata | da-attivare | attive | negate | errore
   const [msg, setMsg] = useState('');
@@ -128,17 +128,24 @@ export default function Notifiche() {
   }
 
   return (
-    <div className="card d3">
-      <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 700 }}>
-        Attiva le notifiche
+    <div className="card d3" style={urgente ? { background: 'var(--coral)' } : undefined}>
+      <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 700, color: urgente ? '#fff' : undefined }}>
+        {urgente ? 'Attiva le notifiche adesso' : 'Attiva le notifiche'}
       </p>
-      <p className="muted" style={{ margin: '0 0 14px' }}>
-        Ti avvisiamo appena il gruppo è pronto o una missione viene approvata.
+      <p style={{ margin: '0 0 14px', fontSize: 13.5, lineHeight: 1.5,
+                  color: urgente ? 'rgba(255,255,255,.9)' : 'var(--muted)' }}>
+        {urgente
+          ? 'Il tuo gruppo può formarsi da un momento all\u2019altro. Se non le attivi ora, rischi di non sapere quando è pronto finché non riapri l\u2019app da solo.'
+          : 'Ti avvisiamo appena il gruppo è pronto o una missione viene approvata.'}
       </p>
-      <button className="btn-ghost" style={{ marginTop: 0 }} onClick={attiva}>
+      <button
+        className={urgente ? 'btn' : 'btn-ghost'}
+        style={urgente ? { marginTop: 0, background: '#fff', color: 'var(--coral)' } : { marginTop: 0 }}
+        onClick={attiva}
+      >
         Attiva
       </button>
-      {msg && <p className="err">{msg}</p>}
+      {msg && <p className="err" style={{ color: urgente ? '#fff' : undefined }}>{msg}</p>}
     </div>
   );
 }
