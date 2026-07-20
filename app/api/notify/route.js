@@ -1,4 +1,5 @@
 import webpush from 'web-push';
+import { chiamanteEAdmin } from '../../../lib/verificaAdmin';
 
 let configurato = false;
 
@@ -19,6 +20,10 @@ function assicuraConfigurazione() {
 
 export async function POST(request) {
   try {
+    if (!(await chiamanteEAdmin(request))) {
+      return Response.json({ error: 'non autorizzato' }, { status: 401 });
+    }
+
     if (!assicuraConfigurazione()) {
       return Response.json({ error: 'Notifiche non configurate: mancano le chiavi VAPID su Vercel.' }, { status: 500 });
     }

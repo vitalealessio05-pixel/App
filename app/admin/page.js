@@ -196,9 +196,14 @@ export default function Admin() {
       `Presto arriva la prima missione. Nel frattempo, rompete il ghiaccio 👋`;
 
     setMsg('Invio in corso…');
+    const sb = supabase();
+    const { data: { session } } = await sb.auth.getSession();
     const res = await fetch('/api/telegram-invia', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
       body: JSON.stringify({ chatId: gruppo.telegram_chat_id, testo }),
     });
     const json = await res.json();

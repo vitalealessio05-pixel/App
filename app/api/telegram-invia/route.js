@@ -1,7 +1,12 @@
 import { inviaMessaggioTelegram } from '../../../lib/telegram';
+import { chiamanteEAdmin } from '../../../lib/verificaAdmin';
 
 export async function POST(request) {
   try {
+    if (!(await chiamanteEAdmin(request))) {
+      return Response.json({ ok: false, motivo: 'non autorizzato' }, { status: 401 });
+    }
+
     const { chatId, testo } = await request.json();
 
     if (!chatId || !testo) {
