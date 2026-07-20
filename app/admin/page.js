@@ -227,37 +227,8 @@ export default function Admin() {
       url: '/profilo',
     });
 
-    // appena approvato, prova ad assegnare subito una missione nuova allo stesso gruppo
-    const { data: usateRows } = await sb
-      .from('group_missions')
-      .select('mission_id')
-      .eq('group_id', groupId);
-    const usate = new Set((usateRows || []).map((r) => r.mission_id));
-    const gruppoCorrente = gruppi.find((gr) => gr.id === groupId);
-    const cittaGruppo = cittaDelSegmento(gruppoCorrente?.segment_key);
-    const disponibili = missioniValidePerCitta(missioni.filter((m) => !usate.has(m.id)), cittaGruppo);
-
-    let msgFinale = 'Approvata, punti assegnati. Notifiche: ' + notificaA.motivo;
-
-    if (disponibili.length > 0) {
-      const prossima = disponibili[Math.floor(Math.random() * disponibili.length)];
-      const scadenza = new Date(Date.now() + 4 * 86400000).toISOString();
-      const { error: errNuova } = await sb
-        .from('group_missions')
-        .insert({ group_id: groupId, mission_id: prossima.id, scadenza });
-
-      if (!errNuova) {
-        await notificaGruppo(groupId, {
-          title: 'Nuova missione!',
-          body: prossima.titolo,
-        });
-        msgFinale += ' — nuova missione assegnata: ' + prossima.titolo;
-      }
-    } else {
-      msgFinale += ' — nessuna missione nuova disponibile per questo gruppo.';
-    }
-
-    setMsg(msgFinale);
+    // la prossima missione la assegna da sola la sequenza a tempo, non più qui
+    setMsg('Approvata, punti assegnati. Notifiche: ' + notificaA.motivo);
     carica();
   }
 
