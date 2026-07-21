@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { inviaMessaggioTelegram } from '../../../lib/telegram';
+import { avvisaAdminErrore } from '../../../lib/avvisaAdmin';
 
 function supabaseServer() {
   return createClient(
@@ -102,15 +103,25 @@ export async function POST(request) {
     }
 
     if (testo === '/start' || testo.startsWith('/start@')) {
-      await inviaMessaggioTelegram(
-        chatId,
-        `Ciao! Sono il bot di Maisola. Aggiungimi a un gruppo (meglio se come amministratore) e mi registro da solo.`
-      );
+      if (msg.chat.type === 'private') {
+        const sb = supabaseServer();
+        await sb.rpc('registra_chat_admin', { p_chat_id: String(chatId) });
+        await inviaMessaggioTelegram(
+          chatId,
+          `Ciao! Da ora ti avviso qui se qualcosa si rompe in Maisola. Per registrare un gruppo, aggiungimi lì invece (meglio se come amministratore).`
+        );
+      } else {
+        await inviaMessaggioTelegram(
+          chatId,
+          `Ciao! Sono il bot di Maisola. Aggiungimi a un gruppo (meglio se come amministratore) e mi registro da solo.`
+        );
+      }
     }
 
     return Response.json({ ok: true });
   } catch (e) {
     console.error('webhook telegram:', e);
+    await avvisaAdminErrore(`Il bot Telegram ha dato un errore imprevisto:\n${e?.message || e}`);
     // rispondi comunque 200: se Telegram riceve un errore, riprova a mandare
     // lo stesso update all'infinito, meglio assorbire l'errore qui
     return Response.json({ ok: true });

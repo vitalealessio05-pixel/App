@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SOGLIA } from '../../lib/supabase';
+import { SOGLIA, supabase } from '../../lib/supabase';
 
 export default function Attesa({ profilo, inAttesa }) {
   const [copiato, setCopiato] = useState(false);
   const [anim, setAnim] = useState(0);
-
-  if (!profilo) return <p className="muted">Un attimo…</p>;
+  const [anteprima, setAnteprima] = useState([]);
 
   const mancano = Math.max(0, SOGLIA - inAttesa);
   const pct = Math.min(1, inAttesa / SOGLIA);
@@ -17,6 +16,22 @@ export default function Attesa({ profilo, inAttesa }) {
     const t = setTimeout(() => setAnim(pct), 250);
     return () => clearTimeout(t);
   }, [pct]);
+
+  useEffect(() => {
+    async function carica() {
+      const { data } = await supabase()
+        .from('missions')
+        .select('titolo, punti, virtuale')
+        .eq('attiva', true)
+        .not('ordine', 'is', null)
+        .order('ordine', { ascending: true })
+        .limit(4);
+      setAnteprima(data || []);
+    }
+    carica();
+  }, []);
+
+  if (!profilo) return <p className="muted">Un attimo…</p>;
 
   const link = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -69,7 +84,40 @@ export default function Attesa({ profilo, inAttesa }) {
         </p>
       </div>
 
-      <div className="card d2" style={{ background: 'var(--sun-soft)' }}>
+      {anteprima.length > 0 && (
+        <div className="card d2">
+          <p className="eyebrow">Vi aspetta</p>
+          <h2 className="display" style={{ fontSize: 19, marginTop: 6, marginBottom: 4 }}>
+            Ecco un assaggio.
+          </h2>
+          <p className="muted" style={{ margin: '0 0 16px', lineHeight: 1.5 }}>
+            Non missioni a caso — una sequenza, dalla più leggera alla più avventurosa.
+          </p>
+          {anteprima.map((m, i) => (
+            <div key={m.titolo} style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
+              borderTop: i > 0 ? '1px solid var(--line)' : 'none',
+            }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%', flex: 'none',
+                background: m.virtuale ? 'var(--iris-soft)' : 'var(--coral-soft)',
+                color: m.virtuale ? 'var(--iris)' : 'var(--coral)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 800,
+              }}>
+                {i + 1}
+              </div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, flex: 1 }}>{m.titolo}</p>
+              <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--muted)' }}>+{m.punti}</span>
+            </div>
+          ))}
+          <p className="hint" style={{ marginTop: 12 }}>
+            E dopo queste, ce ne sono altre — anche più belle.
+          </p>
+        </div>
+      )}
+
+      <div className="card d3" style={{ background: 'var(--sun-soft)' }}>
         <p className="eyebrow" style={{ color: 'var(--sun-text)' }}>Acceleratore</p>
         <h2 className="display" style={{ fontSize: 20, marginTop: 8 }}>
           Dipende da te quanto ci mettiamo.

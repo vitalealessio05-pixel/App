@@ -30,6 +30,7 @@ export default function Admin() {
   const [gruppi, setGruppi] = useState([]);
   const [missioni, setMissioni] = useState([]);
   const [poolTelegram, setPoolTelegram] = useState([]);
+  const [statistiche, setStatistiche] = useState(null);
   const [daVerificare, setDaVerificare] = useState([]);
   const [sel, setSel] = useState([]);
   const [msg, setMsg] = useState('');
@@ -74,6 +75,9 @@ export default function Admin() {
       .is('assegnato_a_group_id', null)
       .order('creato_il');
     setPoolTelegram(pool || []);
+
+    const { data: stats } = await sb.rpc('statistiche_admin');
+    if (stats?.ok) setStatistiche(stats);
 
     const { data: subs } = await sb
       .from('submissions')
@@ -291,6 +295,63 @@ export default function Admin() {
         <p className="adm-subtitle">Formazione gruppi, missioni e verifica delle prove.</p>
 
         {msg && <div className="adm-msg">{msg}</div>}
+
+        {statistiche && (
+          <div className="adm-card">
+            <p className="adm-card-title" style={{ marginBottom: 4 }}>Come vanno le cose</p>
+            <p className="adm-card-sub">Tasso di completamento e tempo medio, missione per missione.</p>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, marginTop: 8 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--a-border)' }}>
+                    <th style={{ padding: '6px 8px', fontWeight: 700 }}>Missione</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 700 }}>Assegnate</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 700 }}>Completate</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 700 }}>%</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 700 }}>Tempo medio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {statistiche.per_missione.map((m) => (
+                    <tr key={m.titolo} style={{ borderBottom: '1px solid var(--a-border)' }}>
+                      <td style={{ padding: '6px 8px' }}>{m.titolo}</td>
+                      <td style={{ padding: '6px 8px' }}>{m.assegnate}</td>
+                      <td style={{ padding: '6px 8px' }}>{m.approvate}</td>
+                      <td style={{ padding: '6px 8px' }}>
+                        {m.tasso_completamento === null ? '—' : (
+                          <span style={{
+                            fontWeight: 700,
+                            color: m.tasso_completamento >= 60 ? 'var(--a-ok)' : 'var(--a-warn)',
+                          }}>
+                            {m.tasso_completamento}%
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '6px 8px' }}>
+                        {m.tempo_medio_ore === null ? '—' : `${m.tempo_medio_ore}h`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {statistiche.gruppi_fermi.length > 0 && (
+              <div style={{ marginTop: 18 }}>
+                <p className="adm-section-label">Gruppi fermi da più di 3 giorni</p>
+                {statistiche.gruppi_fermi.map((g) => (
+                  <div key={g.group_id} className="adm-row" style={{ cursor: 'default' }}>
+                    <span style={{ flex: 1 }}>
+                      <b>{g.nome}</b>
+                      <span className="adm-row-meta"> — fermo su "{g.missione_titolo}" da {g.giorni_fermo} giorni</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="adm-grid">
 

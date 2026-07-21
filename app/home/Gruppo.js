@@ -25,8 +25,28 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
   const [punti, setPunti] = useState(0);
   const [storico, setStorico] = useState([]);
   const [caricando, setCaricando] = useState(true);
+  const [confermaUscita, setConfermaUscita] = useState(false);
+  const [uscendo, setUscendo] = useState(false);
 
   if (!profilo || !gruppo) return <p className="muted">Un attimo…</p>;
+
+  async function esci() {
+    setUscendo(true);
+    try {
+      const sb = supabase();
+      const { data, error } = await sb.rpc('esci_dal_gruppo', { p_group_id: gruppo.id });
+      if (error || !data?.ok) {
+        setUscendo(false);
+        setConfermaUscita(false);
+        return;
+      }
+      onRefresh();
+    } catch (e) {
+      console.error(e);
+      setUscendo(false);
+      setConfermaUscita(false);
+    }
+  }
 
   const carica = useCallback(async () => {
     const sb = supabase();
@@ -109,6 +129,30 @@ export default function Gruppo({ gruppo, profilo, onRefresh }) {
               te lo chiede lui stesso al primo tap.
             </p>
           </>
+        )}
+
+        {!confermaUscita ? (
+          <button className="btn-text" style={{ display: 'block', margin: '14px auto 0', fontSize: 12.5 }}
+                  onClick={() => setConfermaUscita(true)}>
+            Non fa per te? Esci dal gruppo
+          </button>
+        ) : (
+          <div style={{ marginTop: 14, padding: 14, background: 'var(--coral-soft)', borderRadius: 'var(--r-md)' }}>
+            <p style={{ fontSize: 13, lineHeight: 1.5, margin: '0 0 10px', color: 'var(--ink)' }}>
+              Sicuro? Esci da questo gruppo e torni in sala d'attesa per uno nuovo.
+              I punti già guadagnati restano al gruppo, non li porti con te.
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn-ghost" style={{ marginTop: 0, flex: 1 }}
+                      onClick={() => setConfermaUscita(false)} disabled={uscendo}>
+                Resto
+              </button>
+              <button className="btn" style={{ marginTop: 0, flex: 1, background: 'var(--coral)', color: '#fff' }}
+                      onClick={esci} disabled={uscendo}>
+                {uscendo ? 'Un attimo…' : 'Esco davvero'}
+              </button>
+            </div>
+          </div>
         )}
       </div>
 

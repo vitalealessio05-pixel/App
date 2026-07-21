@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+import { avvisaAdminErrore } from '../../../lib/avvisaAdmin';
 
 function supabaseServer() {
   return createClient(
@@ -54,6 +55,7 @@ async function esegui(request) {
     const { data, error } = await sb.rpc('assegna_missioni_dovute');
     if (error) {
       console.error('assegna_missioni_dovute:', error);
+      await avvisaAdminErrore(`La sequenza automatica delle missioni è fallita:\n${error.message}`);
       return Response.json({ ok: false, motivo: error.message }, { status: 500 });
     }
 
@@ -65,6 +67,7 @@ async function esegui(request) {
     return Response.json({ ok: true, assegnate: assegnazioni.length });
   } catch (e) {
     console.error('cron-missioni:', e);
+    await avvisaAdminErrore(`La sequenza automatica delle missioni ha dato un errore imprevisto:\n${e?.message || e}`);
     return Response.json({ ok: false, motivo: 'errore imprevisto' }, { status: 500 });
   }
 }
